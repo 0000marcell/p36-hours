@@ -1,0 +1,14 @@
+<div class="flex-row inline-center default-padding">
+  {{task-path paths=taskPath}}
+</div>
+<div class="default-padding">
+  {{default-clock}}
+</div>
+<div class="default-padding">
+  {{default-tabs options=tabOptions select=(action "taskStatus")}}
+</div>
+<div class="default-padding">
+  {{tree-view data=tasks select=(action "select")
+    add=(action "add") edit=(action "edit")}}
+</div>
+{{outlet}}

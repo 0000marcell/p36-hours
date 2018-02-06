@@ -1,0 +1,9 @@
+.default-button{
+  background-color: #f2f2f2;
+  border: none;
+  padding: 10px;
+}
+
+.default-button:hover{
+  cursor: pointer;
+}

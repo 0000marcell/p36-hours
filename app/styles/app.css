@@ -1,0 +1,42 @@
+@import 'flex.css';
+@import './edit-task.css';
+@import 'components/menu-bar.css';
+@import 'components/default-button.css';
+@import 'components/default-clock.css';
+@import 'components/default-tabs.css';
+@import 'components/tree-view.css';
+@import 'components/tree-view-item.css';
+@import 'fonts.css';
+
+html, body{
+  margin: 0 auto;
+  max-width: 665px;
+  min-width: 300px;
+  padding-top: 30px;
+  font-family: "Nitti Grotesk",Helvetica,Arial,sans-serif;
+}
+
+.default-padding{
+  padding: 10px;
+}
+
+input{
+  width: 370px;
+  height: 43px;
+  margin: 10px 0 10px 0;
+  border: 3px solid #222;
+  font-size: 24px;
+  letter-spacing: 4px;
+  padding-left: 25px;
+}
+
+textarea{
+  width: 370px;
+  margin: 10px 0 10px 0;
+  border: 3px solid #222;
+  font-size: 24px;
+  letter-spacing: 4px;
+  padding-left: 25px;
+}
+
+

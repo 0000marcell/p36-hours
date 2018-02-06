@@ -1,0 +1,29 @@
+<div class="flex-row inline-space-between item-row">
+  <div class="item-name" {{action "select" data}}>
+    {{#if data.selected}}
+      >
+    {{/if}}
+    {{data.name}}
+  </div>
+  <div class="flex-row inline-space-between item-controls">
+    <div>
+      {{link-to "" "tasks.task.edit" data 
+        class="icon icon-edit-modify-streamline"}}
+      <!--
+        <a {{action "edit" data}} 
+          class="icon icon-edit-modify-streamline"></a>
+      -->
+      <a {{action "add" data}} class="icon icon-plus"></a>
+    </div>
+    <div>
+      <a {{action "expand"}} class={{expandClass}}></a>
+    </div>
+  </div>
+</div>
+<div class="flex-row">
+  {{#if showChildren}}
+    <ul>
+      {{yield}}
+    </ul>
+  {{/if}}
+</div>

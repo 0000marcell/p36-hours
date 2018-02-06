@@ -1,0 +1,20 @@
+<h1>{{time}}</h1>
+{{#if (eq clockState 'stopped')}}
+  {{#default-button onClick=(action "startClock")}}
+    START
+  {{/default-button}}
+{{else if (eq clockState 'paused')}}
+  {{#default-button onClick=(action "resumeClock")}}
+    RESUME
+  {{/default-button}}
+  {{#default-button onClick=(action "resetClock")}}
+    RESET
+  {{/default-button}}
+{{else}}
+  {{#default-button onClick=(action "pauseClock")}}
+    PAUSE
+  {{/default-button}}
+  {{#default-button onClick=(action "resetClock")}}
+    RESET
+  {{/default-button}}
+{{/if}}

@@ -1,0 +1,16 @@
+.default-tabs .tab{
+  width: 117px;
+  height: 27px;
+  background-color: #fdfdfd;
+  border: none;
+}
+
+.selected{
+  background-color: #f2f2f2 !important;
+}
+
+.default-tabs .tab:hover{
+  cursor: pointer;
+}
+
+.tab:focus { outline:0; }

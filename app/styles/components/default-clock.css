@@ -1,0 +1,15 @@
+.default-clock{
+  text-align: center;
+  height: 180px;
+}
+
+.default-clock h1{
+  font-size: 72px;
+  margin: 0;
+  letter-spacing: 15px;
+}
+
+.default-clock button{
+  width: 150px;
+  margin: 25px;
+}

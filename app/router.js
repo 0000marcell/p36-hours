@@ -7,6 +7,16 @@ const Router = EmberRouter.extend({
 });
 
 Router.map(function() {
+  this.route('clock');
+  this.route('statistics');
+  this.route('tasks', function() {
+    this.route('new');
+    this.route('task', {
+      path: ':id'
+    }, function() {
+      this.route('edit');
+    });
+  });
 });
 
 export default Router;
