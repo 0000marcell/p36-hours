@@ -6,5 +6,8 @@ export default Route.extend({
   model(){
     //mock.init(this.store);
     return filter.rootTasks(this.store);
+  },
+  redirect(){
+    this.transitionTo('clock');
   }
 });

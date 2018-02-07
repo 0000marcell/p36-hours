@@ -1,0 +1,10 @@
+<h1>{{if isEdit 'edit' 'new'}}</h1>
+{{input value=model.name placeholder="name"}}
+{{textarea 
+  value=model.description  
+  placeholder="description"
+  cols="80" rows="6"}}
+{{input value=tagList}}
+{{#default-button onClick=submit}}
+  {{if isEdit 'edit' 'add'}}
+{{/default-button}}

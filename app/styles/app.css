@@ -1,11 +1,11 @@
 @import 'flex.css';
-@import './edit-task.css';
 @import 'components/menu-bar.css';
 @import 'components/default-button.css';
 @import 'components/default-clock.css';
 @import 'components/default-tabs.css';
 @import 'components/tree-view.css';
 @import 'components/tree-view-item.css';
+@import 'components/task-form.css';
 @import 'fonts.css';
 
 html, body{
