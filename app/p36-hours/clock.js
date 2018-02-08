@@ -1,8 +1,9 @@
 export default {
-  start(time, cb){
+  start(time, cb, finished){
     this.cb = cb;
     this.time = time; 
     this.interval = setInterval(this.clockTick.bind(this), 1000);
+    this.finished = finished;
     return this;
   },
   reset(cb){
@@ -20,8 +21,13 @@ export default {
   clockTick(){
     let sec = this.convertToSec(this.time),
         result  = sec - 1;
-    this.time = this.convertToMin(result);
-    this.cb(this.time);
+    if(result < 0){
+      clearInterval(this.interval);
+      this.finished()
+    }else{
+      this.time = this.convertToMin(result);
+      this.cb(this.time);
+    }
   },
   convertToSec(time){
     let splitTime = time.split(':');
@@ -30,7 +36,10 @@ export default {
   },
   convertToMin(time){
     let min = Math.floor(time/ 60),
-        sec = time % 60;
-    return `${min}:${sec}`;
+        sec = time % 60,
+        paddingZero = '';
+    if(sec < 10)
+      paddingZero = '0';
+    return `${min}:${paddingZero}${sec}`;
   }
 }

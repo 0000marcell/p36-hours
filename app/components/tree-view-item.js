@@ -1,9 +1,11 @@
 import Component from '@ember/component';
-import { set, get } from '@ember/object';
+import { set, get, computed } from '@ember/object';
 
 export default Component.extend({
   tagName: 'li',
   classNames: ['tree-view-item'],
+  classNameBindings: ['selected'],
+  selected: computed.alias('data.selected'),
   showChildren: true,
   expandClass: 'icon icon-down-open-big',
   actions: {

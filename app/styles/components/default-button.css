@@ -7,3 +7,9 @@
 .default-button:hover{
   cursor: pointer;
 }
+
+.caution-button{
+  background-color: #F44336;
+  height: 48px;
+  color: #fff;
+}

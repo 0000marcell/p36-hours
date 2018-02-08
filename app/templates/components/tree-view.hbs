@@ -1,21 +1,5 @@
 <ul>
   {{#each data as |item|}}
-    {{#tree-view-item data=item select=(action "select") 
-        add=add edit=edit}}
-      {{#each item.children as |item|}}
-        {{#tree-view-item data=item select=(action "select") 
-          add=add edit=edit}}
-          {{#each item.children as |item|}}
-            {{#tree-view-item data=item select=(action "select") 
-              add=add edit=edit}}
-              {{#each item.children as |item|}}
-                {{tree-view-item data=item  select=(action "select") 
-                  add=add edit=edit}}
-              {{/each}}
-            {{/tree-view-item}}
-          {{/each}}
-        {{/tree-view-item}}
-      {{/each}}
-    {{/tree-view-item}}
+    {{tree-view-item data=item select=(action 'select') add=add}}
   {{/each}}
 </ul>

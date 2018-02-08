@@ -1,6 +1,6 @@
 .tree-view-item{
   max-width: 523px;
-  height: 32px;
+  //height: 32px;
   list-style-type: none;
   letter-spacing: 2px;
 }

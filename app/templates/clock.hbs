@@ -2,13 +2,15 @@
   {{task-path paths=taskPath}}
 </div>
 <div class="default-padding">
-  {{default-clock}}
+  {{default-clock time=time 
+    finished=(action "timerFinished") 
+    register=(action "registerClock")}}
 </div>
 <div class="default-padding">
   {{default-tabs options=tabOptions select=(action "taskStatus")}}
 </div>
 <div class="default-padding">
-  {{tree-view data=tasks select=(action "select")
+  {{tree-view data=filteredTasks select=(action "select")
     add=(action "add")}}
 </div>
 {{outlet}}

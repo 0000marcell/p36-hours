@@ -1,23 +1,16 @@
 import rsvp from 'rsvp';
 
 export default {
-  rootTasks(store){
+  rootTasks(tasks, status){
     return new rsvp.Promise((resolve) => {
-      let results = [],
-          proms = [];
-      store.findAll('task').then((tasks) => {
-        tasks.forEach((task) => {
-          proms.push(
-            task.get('parent').then((parent) => {
-              if(!parent && task.get('status') === 'active')
-                results.push(task);
-            })
-          );
-        });
-        rsvp.all(proms).then(() => {
-          resolve(results); 
-        });
-      });  
+      tasks.then((tasks) => {
+        resolve(
+          tasks.filter((task) => {
+            return (!task.get('parent') && 
+              task.get('status') === status)
+          })
+        );
+      });
     });
   }
 }

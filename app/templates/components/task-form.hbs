@@ -1,4 +1,11 @@
-<h1>{{if isEdit 'edit' 'new'}}</h1>
+<div class="flex-row inline-space-between">
+  <h1>{{if isEdit 'edit' 'new'}}</h1>
+  {{#if isEdit}}
+    {{#default-button class="caution-button" onClick=delete}}
+      delete
+    {{/default-button}}   
+  {{/if}}
+</div>
 {{input value=model.name placeholder="name"}}
 {{textarea 
   value=model.description  

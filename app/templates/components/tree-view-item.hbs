@@ -1,8 +1,5 @@
 <div class="flex-row inline-space-between item-row">
   <div class="item-name" {{action "select" data}}>
-    {{#if data.selected}}
-      >
-    {{/if}}
     {{data.name}}
   </div>
   <div class="flex-row inline-space-between item-controls">
@@ -17,9 +14,11 @@
   </div>
 </div>
 <div class="flex-row">
-  {{#if showChildren}}
-    <ul>
-      {{yield}}
-    </ul>
-  {{/if}}
+  <ul>
+    {{#if showChildren}}
+      {{#each data.children as |child|}} 
+        {{tree-view-item data=child select=select add=add}}
+      {{/each}}
+    {{/if}}
+  </ul>
 </div>

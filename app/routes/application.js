@@ -5,7 +5,9 @@ import filter from '../p36-hours/filters';
 export default Route.extend({
   model(){
     //mock.init(this.store);
-    return filter.rootTasks(this.store);
+    return {
+      tasks: this.store.findAll('task')
+    };
   },
   redirect(){
     this.transitionTo('clock');

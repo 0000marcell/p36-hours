@@ -1,9 +1,9 @@
-<h1>{{time}}</h1>
-{{#if (eq clockState 'stopped')}}
+<h1>{{_internalTime}}</h1>
+{{#if (eq state 'stopped')}}
   {{#default-button onClick=(action "startClock")}}
     START
   {{/default-button}}
-{{else if (eq clockState 'paused')}}
+{{else if (eq state 'paused')}}
   {{#default-button onClick=(action "resumeClock")}}
     RESUME
   {{/default-button}}
