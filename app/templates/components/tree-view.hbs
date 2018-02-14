@@ -1,5 +1,12 @@
-<ul>
-  {{#each data as |item|}}
-    {{tree-view-item data=item select=(action 'select') add=add}}
-  {{/each}}
-</ul>
+{{#if isLoading}}
+  <div class="loading-container">
+    <img src="http://www.scanorama.lt/sites/all/themes/sca_responsive/img/hex-loader.gif" />
+  </div>
+{{else}}
+  <ul>
+    {{#each data as |item|}}
+      {{tree-view-item data=item select=(action 'select') add=add}}
+    {{/each}}
+  </ul>
+{{/if}}
+

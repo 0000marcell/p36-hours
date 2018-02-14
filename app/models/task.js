@@ -7,7 +7,7 @@ export default DS.Model.extend({
   parent: DS.belongsTo('task', {inverse: 'children', async: false}),
   children: DS.hasMany('task', {inverse: 'parent', async: false}),
   pomodoros: DS.hasMany('pomodoro', 
-    { inverse: 'task', async: false}),
+    { inverse: 'task'}),
   status: DS.attr('string'),
   rev: DS.attr('string')
 });

@@ -1,5 +1,5 @@
 import { test } from 'ember-qunit';
-import clock from 'p36-hours/libs/clock';
+import clock from 'p36-hours/p36-hours/clock';
 
 test('converts string time to sec #unit-clock-test-01', 
   function(assert) {

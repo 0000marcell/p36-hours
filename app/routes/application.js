@@ -1,15 +1,18 @@
 import Route from '@ember/routing/route';
 import mock from '../p36-hours/mock';
-import filter from '../p36-hours/filters';
+import { hash } from 'rsvp';
 
 export default Route.extend({
   model(){
     //mock.init(this.store);
-    return {
-      tasks: this.store.findAll('task')
-    };
-  },
-  redirect(){
-    this.transitionTo('clock');
+    /*
+    mock.grabOldInfo(this.store).then(() => {
+      console.log('finish!');
+    });
+    */
+    return hash({
+      tasks: this.store.findAll('task'),
+      pomodoros: this.store.findAll('pomodoro') 
+    });
   }
 });
