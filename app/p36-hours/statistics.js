@@ -1,6 +1,7 @@
 import filters from './filters';
 import { timeFormat } from 'd3-time-format';
 import helpers from './helpers';
+import { get } from '@ember/object';
 
 export default {
   lineChart(pomodoros, startDate, endDate){
@@ -9,7 +10,7 @@ export default {
           startDate, endDate),
         resultObj = {};
     results.forEach((pomodoro) => {
-      let pomDate = new Date(pomodoro.get('date'));
+      let pomDate = new Date(get(pomodoro, 'date'));
       pomDate.setHours(0, 0, 0, 0).toString();
       resultObj[pomDate] = 
         resultObj[pomDate] ? 
@@ -24,6 +25,19 @@ export default {
         value: resultObj[date.toString()]});
       return acc;
     }, []);
+  },
+  formatComparison(result){
+    let text,
+        hours = Math.round(Math.abs(result) / 2);
+    if(result >= 1){
+      text = `${hours} ${(hours > 1) ? 'hours' : 'hour'} more`; 
+    }else if(result === 0){
+      text = `about the same time`;
+    }else{
+      text = 
+        `${hours} ${(hours > 1) ? 'hours' : 'hour'} less`; 
+    }
+    return text;
   },
   lastWeekComparison(pomodoros){
     let today = new Date(),
@@ -48,9 +62,22 @@ export default {
           today.getMonth() - 1, today.getDate());
     let currPomodoros = filters.pomodorosInRange(pomodoros, 
                                   firstDayMonth, today),
-        lastWPomodoros = filters.pomodorosInRange(pomodoros, 
+        lastMPomodoros = filters.pomodorosInRange(pomodoros, 
                                   firstDayLastMonth, 
                                   thisDayLastMonth);
-    return currPomodoros.length - lastWPomodoros.length;
+    return currPomodoros.length - lastMPomodoros.length;
+  },
+  calendarChart(pomodoros){
+    let formatTime = timeFormat("%Y-%m-%d"),
+        resultObj = {};
+    pomodoros.forEach((pomodoro) => {
+      let pomDate = new Date(get(pomodoro, 'date'));
+      pomDate.setHours(0, 0, 0, 0);
+      pomDate = formatTime(pomDate);
+      resultObj[pomDate] = 
+        resultObj[pomDate] ? 
+          resultObj[pomDate] + 1 : 1
+    });
+    return resultObj;
   }
 }

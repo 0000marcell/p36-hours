@@ -2,6 +2,7 @@ import Controller from '@ember/controller';
 import { get, set } from '@ember/object';
 import { inject } from '@ember/service';
 import filter from '../p36-hours/filters';
+import helpers from '../p36-hours/helpers';
 
 export default Controller.extend({
   intervals: 0, 

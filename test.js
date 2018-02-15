@@ -1,10 +1,7 @@
-let results = {};
+function doit(test, name = 'marcell'){
+  console.log(name);
+}
 
-let date = '24-Apr-07';
-
-results[date] = results[date] ? results[date] + 1 : 1;
-results[date] += 1;
-console.log(results);
-
+doit('monteiro');
 
 

@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import calendarChartData from './calendar-chart-data';
+import { get } from '@ember/object';
 import { select } from 'd3-selection';
 import { timeFormat } from 'd3-time-format';
 import { timeDays, timeMonths, timeYears } from 'd3-time';
@@ -7,13 +7,14 @@ import { scaleQuantize } from 'd3-scale';
 import { range } from 'd3-array';
 
 export default Component.extend({
-  didInsertElement(){
-    this.calendarChart();
+  didRender(){
+    this._super(...arguments);
+    let data = get(this, 'data');
+    if(data)
+      this.calendarChart(data);
   },
-  calendarChart(){
-
-    let data = calendarChartData,
-        years = Object.keys(data).map((date) => {
+  calendarChart(data){
+    let years = Object.keys(data).map((date) => {
           return +date.split('-')[0]
         }),
         firstYear = Math.min(...years),

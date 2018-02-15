@@ -4,8 +4,10 @@
   </div>
   <div class="flex-row inline-center default-padding">
     <div class="flex-column">
-      {{performance-info text=performanceText1}}
-      {{performance-info text=performanceText2}}
+      {{performance-info text=lastWeekText 
+        signal=lastWeekComparison}}
+      {{performance-info text=lastMonthText
+        signal=lastMonthComparison}}
     </div>
   </div>
   <div class="flex-row inline-center default-padding">
@@ -20,14 +22,18 @@
       <h3>{{selectedMode}}:</h3>
       {{#power-select-multiple  
         selected=selectedItems
+        searchField="name"
         options=modeItems onchange=(action "selectItems") 
         as |item|}}
-        {{item}}
+        {{item.name}}
       {{/power-select-multiple}}
+      {{#default-button onClick=(action 'buildData')}}
+        load charts
+      {{/default-button}}   
     </div>
   </div>
   <div class="default-padding">
-    {{calendar-chart}}
+    {{calendar-chart data=calendarChartData}}
   </div>
   <div class="default-padding">
     {{radar-chart}}

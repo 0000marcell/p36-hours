@@ -2,18 +2,22 @@ import { moduleFor, test } from 'ember-qunit';
 import statistics from 'p36-hours/p36-hours/statistics';
 import { all } from 'rsvp';
 
-let dates = [],
-    date = new Date(),
-    j = 0;
-date.setDate(date.getDate() - 70);
-for (var i = 0; i < 125; i++) {
-  dates.push(new Date(date.getTime()));
-  if(j > 1){
-    date.setDate(date.getDate() + 1)
-    j = 0;
+
+function lastThreeMonthsDates(){
+  let today = new Date(),
+      threeMonthsAgo = new Date(today.getFullYear(), 
+        today.getMonth() - 3),
+      newDate = threeMonthsAgo,
+      dates = [];
+  while(newDate < today){
+    dates.push(newDate);
+    newDate.setDate(newDate.getDate() + 1);
   }
-  j++;
+  return dates;
 }
+
+let dates = lastThreeMonthsDates();
+
 
 moduleFor('statistics',
   'Unit | p36-hours | statistics',{
@@ -60,3 +64,33 @@ test('construct month comparison #unit-statistics-test-03',
     });
   });
 
+test('format text from the comparison #unit-statistics-test-04', 
+  function(assert){
+  assert.equal(statistics.formatComparison(0), 
+    'about the same time');
+  assert.equal(statistics.formatComparison(1), '1 hour more');
+  assert.equal(statistics.formatComparison(2), '1 hour more');
+  assert.equal(statistics.formatComparison(3), '2 hours more');
+  assert.equal(statistics.formatComparison(4), '2 hours more');
+  assert.equal(statistics.formatComparison(-1), '1 hour less');
+  assert.equal(statistics.formatComparison(-2), '1 hour less');
+  assert.equal(statistics.formatComparison(-3), '2 hours less');
+  assert.equal(statistics.formatComparison(-4), '2 hours less');
+});
+
+test('build calendar chart data #unit-statistics-test-05', 
+  function(assert){
+  let pomodoros = [
+    {date: new Date(2013, 1, 2).toString()},
+    {date: new Date(2013, 1, 2).toString()},
+    {date: new Date(2013, 1, 3).toString()},
+    {date: new Date(2013, 1, 4).toString()}
+  ];
+  let result = statistics.calendarChart(pomodoros),
+      expected = {
+        '2013-02-02': 2,
+        '2013-02-03': 1,
+        '2013-02-04': 1
+      };
+  assert.deepEqual(result, expected);
+});
