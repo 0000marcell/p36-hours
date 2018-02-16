@@ -8,6 +8,13 @@ export default Component.extend({
     this._super(...arguments);
     let data = [
         [ {axis:"development", value: 0.60},
+          {axis:"mathematics", value: 0.20},
+          {axis:"mathematics", value: 0.20},
+        ]
+    ];
+    /*
+    let data = [
+        [ {axis:"development", value: 0.60},
           {axis:"mathematics", value: 0.10},
           {axis:"computer science", value: 0.15},
           {axis:"soft skills", value: 0.15},
@@ -15,6 +22,7 @@ export default Component.extend({
           {axis:"soft skills", value: 0.15}
         ]
     ];
+    */
     this.radarChart(data);
   },
   radarChart(data){

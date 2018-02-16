@@ -2,6 +2,7 @@ import filters from './filters';
 import { timeFormat } from 'd3-time-format';
 import helpers from './helpers';
 import { get } from '@ember/object';
+import rsvp from 'rsvp';
 
 export default {
   lineChart(pomodoros, startDate, endDate){
@@ -79,5 +80,52 @@ export default {
           resultObj[pomDate] + 1 : 1
     });
     return resultObj;
+  },
+  buildRadarData(tasks){
+    let results = [],
+        promises = [];
+    return new rsvp.Promise((resolve) => {
+      tasks.forEach((task) => {
+        promises.push(
+          task.pomodoros.then((pomodoros) => {
+            results.push({ axis: get(task, 'name'),
+              value: pomodoros.length });
+          })
+        );
+      });
+      rsvp.all(promises).then(() => { 
+        let tasksTotal = results.reduce((acc, item) => {
+          return item.value + acc;
+        }, 0);
+        results = results.map((item) => {
+          item.value = Math.trunc(item.value * 100/tasksTotal)/100;
+          return item;
+        });
+        resolve([results]) 
+      });
+    });
+  },
+  radarChart(tasks){
+    return new rsvp.Promise((resolve) => {
+      let promises = [];
+      if(get(tasks, 'length') > 2){
+          promises.push(
+            this.buildRadarData(tasks).then((results) => {
+              resolve(results);
+            })
+          );
+      }else{
+        tasks.forEach((task) => {
+          if(get(task, 'children.length') > 2){
+            promises.push(
+              this.buildRadarData(tasks).then((results) => {
+                resolve(results);
+              })
+            );
+          }
+        });
+      }
+      rsvp.all(promises).then((results) => { resolve(results)});
+    });
   }
 }

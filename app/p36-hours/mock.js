@@ -1,25 +1,30 @@
 import rsvp from 'rsvp';
 
 export default {
+  deleteTask(task){
+    return new rsvp.Promise((resolve) => {
+      let deletedPomodoros = [];
+      task.get('pomodoros').then((pomodoros) => {
+        pomodoros.map((pomodoro) => {
+          deletedPomodoros.push(pomodoro.destroyRecord());
+        });
+      });
+      rsvp.all(deletedPomodoros).then(() => {
+        task.destroyRecord().then(() => {
+          resolve();
+        });
+      });
+    });
+  },
   deleteAll(store){
     return new rsvp.Promise((resolve) => {
       store.findAll('task').then((tasks) => {
-        let deleting = [];
+        let deletedTasks = [];
         tasks.forEach((task) => {
-          task.get('pomodoros').forEach((pomodoro) => {
-            deleting.push(
-              pomodoro.destroyRecord()
-            );
-          });
-        });
-        rsvp.all(deleting).then(() => {
-          deleting = [];
-          tasks.forEach((task) => {
-            deleting.push(
-              task.destroyRecord()
-            );
-          });
-          rsvp.all(deleting).then(() => {
+          deletedTasks.push(
+            this.deleteTask(task)
+          );
+          rsvp.all(deletedTasks).then(() => {
             resolve();
           });
         });
@@ -48,6 +53,27 @@ export default {
       });
     });
   },
+  constructDbFromObj(store, obj){
+    return new rsvp.Promise((resolve) => {
+      obj.tasks.forEach((task) => {
+        let newTask = store.createRecord('task', {
+          name: task.name,
+          status: 'active'
+        });
+        task.pomodoros.forEach(async (pomodoro) => {
+          let newPomodoro = this.store.createRecord('pomodoro', {
+            date: new Date(pomodoro.date)
+          });
+          newPomodoro.set('task', newTask);
+          newTask.get('pomodoros').pushObject(pomodoro);
+          await newPomodoro.save().then(() => {
+            newTask.save();
+          });
+        });
+      });
+      resolve();
+    });
+  },
   // CORS needs to be disabled
   grabOldInfo(store){
     return new rsvp.Promise((resolve) => {
@@ -73,23 +99,22 @@ export default {
                                   date: new Date(pomodoro.date),
                                   task: task
                                 });
-              createdPomodoro.set('task', task);
               pomodoros.push(createdPomodoro);
+              task.get('pomodoros').pushObject(createdPomodoro);
             });
-            task.set('pomodoros', pomodoros);
             tasks.push(task);
           });
           let saving = [];
-          tasks.forEach((task) => {
+          pomodoros.forEach((pomodoro) => {
             saving.push(
-              task.save()
+              pomodoro.save()
             );
           });
           rsvp.all(saving).then(() => {
             saving = [];
-            pomodoros.forEach((pomodoro) => {
+            tasks.forEach((task) => {
               saving.push(
-                pomodoro.save()
+                task.save()
               );
             });
             rsvp.all(saving).then(() => {

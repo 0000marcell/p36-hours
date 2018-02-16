@@ -1,6 +1,6 @@
 import { moduleFor, test } from 'ember-qunit';
 import statistics from 'p36-hours/p36-hours/statistics';
-import { all } from 'rsvp';
+import rsvp from 'rsvp';
 
 
 function lastThreeMonthsDates(){
@@ -32,7 +32,7 @@ moduleFor('statistics',
           }).save()
         )
       });
-      await all(saving);
+      await rsvp.all(saving);
     }
 });
 
@@ -94,3 +94,57 @@ test('build calendar chart data #unit-statistics-test-05',
       };
   assert.deepEqual(result, expected);
 });
+
+test('build radar chart data #unit-statistics-test-06', 
+  async function(assert){
+
+  let pomodoros = new rsvp.Promise((resolve) => {
+    let results = dates.map((date) => ({ date: date }));
+    resolve(results);
+  });
+
+  let threeTasks = [],
+      twoTasks = [],
+      nestedTasks = [];
+  for (var i = 0; i < 3; i++) {
+    threeTasks.push(
+      {
+        id: i,
+        name: `task ${i}`,
+        pomodoros: pomodoros
+      }
+    );
+
+    if(i < 2){
+      twoTasks.push(
+        {
+          id: i,
+          name: `task ${i}`,
+          pomodoros: pomodoros
+        }
+      );
+    }
+  }
+
+  nestedTasks = [
+    {id: 5, name: 'task 3'},
+    {id: 6, name: 'task 4'}
+  ];
+  nestedTasks[0]['children'] = threeTasks;
+
+  let expected = [
+    [ 
+      {axis:'task 0', value: 0.33},
+      {axis:'task 1', value: 0.33},
+      {axis:'task 2', value: 0.33},
+    ]
+  ];
+  assert.deepEqual(await statistics.radarChart(threeTasks), 
+      expected, 'load data for three tasks!');
+  assert.deepEqual(await statistics.radarChart(twoTasks), 
+    [], 'return a empty array if the data is not valid');
+  assert.deepEqual(await statistics.radarChart(threeTasks), 
+    expected, 'load data for nestedTasks!');
+});
+
+

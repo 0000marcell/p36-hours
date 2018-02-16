@@ -1,7 +1,11 @@
-function doit(test, name = 'marcell'){
-  console.log(name);
+let obj = { name: 'marcell' }
+let obj2 = {
+  name: obj.name
 }
 
-doit('monteiro');
+console.log(obj2.name);
 
+obj.name = 'monteiro';
+
+console.log(obj2.name);
 

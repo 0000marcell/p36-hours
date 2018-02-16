@@ -20,12 +20,12 @@ export default Controller.extend({
         items.forEach((item) => {
           requests.push(
             item.model.get('pomodoros').then((pomodoros) => {
-              allPomodoros.concat(pomodoros);
+              allPomodoros = 
+                allPomodoros.concat(...pomodoros.toArray());
             })
           );
         });
         all(requests).then(() => {
-          console.log('pomodoros: ', allPomodoros);
           set(this, 'calendarChartData', 
             statistics.calendarChart(allPomodoros));
         });

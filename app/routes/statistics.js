@@ -1,6 +1,7 @@
 import Route from '@ember/routing/route';
 import statistics from '../p36-hours/statistics';
 import helpers from '../p36-hours/helpers';
+import { get } from '@ember/object';
 
 export default Route.extend({
   setupController(controller, model){
@@ -10,6 +11,10 @@ export default Route.extend({
     let lineChartData = statistics.lineChart(model.pomodoros, 
       twoWeeksAgo, new Date());
     controller.set('lineChartData', lineChartData);
+
+    model.tasks.forEach((task) => {
+      console.log(task.get('pomodoros.length'));
+    });
 
     let lastWeekComparison = statistics
             .lastWeekComparison(model.pomodoros),
