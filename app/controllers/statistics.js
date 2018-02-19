@@ -16,8 +16,10 @@ export default Controller.extend({
           mode = get(this, 'selectedMode');
       if(mode === 'tasks'){
         let requests = [],
-            allPomodoros = [];
+            allPomodoros = [],
+            allTasks = [];
         items.forEach((item) => {
+          allTasks.push(item.model);
           requests.push(
             item.model.get('pomodoros').then((pomodoros) => {
               allPomodoros = 
@@ -28,6 +30,11 @@ export default Controller.extend({
         all(requests).then(() => {
           set(this, 'calendarChartData', 
             statistics.calendarChart(allPomodoros));
+          statistics.radarChart(allTasks).then((radarChartData) => {
+            set(this, 'radarChartData',
+              radarChartData);
+          });
+          
         });
       }
     }

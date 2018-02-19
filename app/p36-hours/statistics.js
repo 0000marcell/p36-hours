@@ -87,7 +87,7 @@ export default {
     return new rsvp.Promise((resolve) => {
       tasks.forEach((task) => {
         promises.push(
-          task.pomodoros.then((pomodoros) => {
+          get(task, 'pomodoros').then((pomodoros) => {
             results.push({ axis: get(task, 'name'),
               value: pomodoros.length });
           })

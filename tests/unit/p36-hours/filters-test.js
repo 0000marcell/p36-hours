@@ -23,8 +23,6 @@ moduleFor('filters',
       )
     });
     await all(saving);
-  },
-  afterEach(){
   }
 });
 

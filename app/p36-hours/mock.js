@@ -19,12 +19,28 @@ export default {
   deleteAll(store){
     return new rsvp.Promise((resolve) => {
       store.findAll('task').then((tasks) => {
-        let deletedTasks = [];
+        let deleting = [];
         tasks.forEach((task) => {
-          deletedTasks.push(
-            this.deleteTask(task)
+          deleting.push(
+            new rsvp.Promise((resolve) => {
+              task.get('pomodoros').then((pomodoros) => {
+                let deletedPomodoros = [];
+                pomodoros.map((pomodoro) => {
+                  deletedPomodoros.push(pomodoro.destroyRecord());
+                });
+                rsvp.all(deletedPomodoros).then(() => {
+                  resolve();
+                });
+              })
+            })
           );
-          rsvp.all(deletedTasks).then(() => {
+        });
+        rsvp.all(deleting).then(() => {
+          let deletedTask = [];
+          tasks.map((task) => {
+            deletedTask.push(task.destroyRecord());
+          });
+          rsvp.all(deletedTask).then(() => {
             resolve();
           });
         });
@@ -55,23 +71,33 @@ export default {
   },
   constructDbFromObj(store, obj){
     return new rsvp.Promise((resolve) => {
+      let promises = [];
       obj.tasks.forEach((task) => {
-        let newTask = store.createRecord('task', {
-          name: task.name,
-          status: 'active'
-        });
-        task.pomodoros.forEach(async (pomodoro) => {
-          let newPomodoro = this.store.createRecord('pomodoro', {
-            date: new Date(pomodoro.date)
-          });
-          newPomodoro.set('task', newTask);
-          newTask.get('pomodoros').pushObject(pomodoro);
-          await newPomodoro.save().then(() => {
-            newTask.save();
-          });
-        });
+        promises.push(
+          new rsvp.Promise((resolve) => {
+            return store.createRecord('task', {
+              name: task.name,
+              status: 'active'
+            }).save().then((newTask) => {
+              let savedPomodoros = [];
+              task.pomodoros.forEach((pomodoro) => {
+                savedPomodoros.push(
+                  store.createRecord('pomodoro', {
+                    date: new Date(pomodoro.date),
+                    task: newTask
+                  }).save()
+                );
+              });
+              return rsvp.all(savedPomodoros).then(() => {
+                resolve()
+              });
+            });
+          })
+        );
       });
-      resolve();
+      return rsvp.all(promises).then(() => {
+        resolve();
+      });
     });
   },
   // CORS needs to be disabled
@@ -86,40 +112,9 @@ export default {
           region: region});
         let bucket = new AWS.S3({params: {Bucket: 'pomodorog'}});
         bucket.getObject({Key: 'new.json'}, (error, data) => {
-          let obj = JSON.parse(data.Body.toString()),
-              pomodoros = [],
-              tasks = [];
-          obj.tasks.forEach((taskObj) => {
-            let task = store.createRecord('task', {
-              name: taskObj.name,
-              status: 'active' 
-            });
-            taskObj.pomodoros.forEach((pomodoro) => {
-              let createdPomodoro = store.createRecord('pomodoro', {
-                                  date: new Date(pomodoro.date),
-                                  task: task
-                                });
-              pomodoros.push(createdPomodoro);
-              task.get('pomodoros').pushObject(createdPomodoro);
-            });
-            tasks.push(task);
-          });
-          let saving = [];
-          pomodoros.forEach((pomodoro) => {
-            saving.push(
-              pomodoro.save()
-            );
-          });
-          rsvp.all(saving).then(() => {
-            saving = [];
-            tasks.forEach((task) => {
-              saving.push(
-                task.save()
-              );
-            });
-            rsvp.all(saving).then(() => {
-              resolve();
-            });
+          let obj = JSON.parse(data.Body.toString());
+          this.constructDbFromObj(store, obj).then(() => {
+            resolve('db data saved!');
           });
         });
       });

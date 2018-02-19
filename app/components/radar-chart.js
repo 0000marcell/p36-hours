@@ -1,31 +1,19 @@
 import Component from '@ember/component';
+import { get } from '@ember/object';
 import { max } from 'd3-array';
 import { select } from 'd3-selection';
 import { format } from 'd3-format';
 
 export default Component.extend({
-  didInsertElement(){
+  didRender(){
     this._super(...arguments);
-    let data = [
-        [ {axis:"development", value: 0.60},
-          {axis:"mathematics", value: 0.20},
-          {axis:"mathematics", value: 0.20},
-        ]
-    ];
-    /*
-    let data = [
-        [ {axis:"development", value: 0.60},
-          {axis:"mathematics", value: 0.10},
-          {axis:"computer science", value: 0.15},
-          {axis:"soft skills", value: 0.15},
-          {axis:"soft skills", value: 0.15},
-          {axis:"soft skills", value: 0.15}
-        ]
-    ];
-    */
-    this.radarChart(data);
+    let data = get(this, 'data');
+    if(data)
+      this.radarChart(data);
   },
   radarChart(data){
+    document
+      .querySelector('.radar-chart').innerHTML = '';
     let graph = {
         radius: 5,
         w: 500,

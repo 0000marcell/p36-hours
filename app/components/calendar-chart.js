@@ -14,6 +14,8 @@ export default Component.extend({
       this.calendarChart(data);
   },
   calendarChart(data){
+    document
+      .querySelector('.calendar-chart').innerHTML = '';
     let years = Object.keys(data).map((date) => {
           return +date.split('-')[0]
         }),
