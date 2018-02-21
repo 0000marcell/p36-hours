@@ -1,11 +1,51 @@
-let obj = { name: 'marcell' }
-let obj2 = {
-  name: obj.name
-}
+let obj = [
+  {
+    name: 'tag 1',
+    tasks: [
+      {
+        name: 'task 1',
+        pomodoros: [
+          { date: '1'},
+          { date: '2'},
+          { date: '2'}
+        ]
+      },
+      {
+        name: 'task 2',
+        pomodoros: [
+          { date: '1'},
+          { date: '2'},
+          { date: '2'}
+        ]
+      }
+    ]
+  },
+  {
+    name: 'tag 2',
+    tasks: [
+      {
+        name: 'task 1',
+        pomodoros: [
+          { date: '1'},
+          { date: '2'},
+          { date: '2'}
+        ]
+      },
+      {
+        name: 'task 2',
+        pomodoros: [
+          { date: '1'},
+          { date: '2'},
+          { date: '2'}
+        ]
+      }
+    ]
+  }
+  
+];
 
-console.log(obj2.name);
+let result = obj.map((item) => (
+  item.tasks
+));
 
-obj.name = 'monteiro';
-
-console.log(obj2.name);
-
+console.log(result);

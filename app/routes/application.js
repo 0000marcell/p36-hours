@@ -11,7 +11,8 @@ export default Route.extend({
     */
     return hash({
       tasks: this.store.findAll('task'),
-      pomodoros: this.store.findAll('pomodoro') 
+      pomodoros: this.store.findAll('pomodoro'),
+      tags: this.store.findAll('tag')
     });
   }
 });

@@ -12,6 +12,8 @@ export default Component.extend({
       this.radarChart(data);
   },
   radarChart(data){
+    if(!data.length)
+      return;
     document
       .querySelector('.radar-chart').innerHTML = '';
     let graph = {

@@ -81,44 +81,45 @@ export default {
     });
     return resultObj;
   },
-  buildRadarData(tasks){
+  buildRadarData(obj){
     let results = [],
         promises = [];
     return new rsvp.Promise((resolve) => {
-      tasks.forEach((task) => {
+      obj.forEach((item) => {
         promises.push(
-          get(task, 'pomodoros').then((pomodoros) => {
-            results.push({ axis: get(task, 'name'),
+          Promise.resolve(get(item, 'pomodoros'))
+            .then((pomodoros) => {
+            results.push({ axis: get(item, 'name'),
               value: pomodoros.length });
           })
         );
       });
       rsvp.all(promises).then(() => { 
-        let tasksTotal = results.reduce((acc, item) => {
+        let itemsTotal = results.reduce((acc, item) => {
           return item.value + acc;
         }, 0);
         results = results.map((item) => {
-          item.value = Math.trunc(item.value * 100/tasksTotal)/100;
+          item.value = Math.trunc(item.value * 100/itemsTotal)/100;
           return item;
         });
         resolve([results]) 
       });
     });
   },
-  radarChart(tasks){
+  radarChart(obj){
     return new rsvp.Promise((resolve) => {
       let promises = [];
-      if(get(tasks, 'length') > 2){
+      if(get(obj, 'length') > 2){
           promises.push(
-            this.buildRadarData(tasks).then((results) => {
+            this.buildRadarData(obj).then((results) => {
               resolve(results);
             })
           );
       }else{
-        tasks.forEach((task) => {
-          if(get(task, 'children.length') > 2){
+        obj.forEach((item) => {
+          if(get(item, 'children.length') > 2){
             promises.push(
-              this.buildRadarData(tasks).then((results) => {
+              this.buildRadarData(obj).then((results) => {
                 resolve(results);
               })
             );
@@ -127,5 +128,26 @@ export default {
       }
       rsvp.all(promises).then((results) => { resolve(results)});
     });
+  },
+  async radarChartDataBasedOnTags(tags){
+    let resultObj = [],
+        completedTasks = [];
+    for(let tag of tags){
+      let tasks = await tag.get('tasks').toArray(),
+          allPomodoros = [];
+      for(let task of tasks){
+        if(completedTasks.indexOf(task.get('id')) === -1){
+          let pomodoros = await task.get('pomodoros');
+          allPomodoros = 
+                allPomodoros.concat(...pomodoros.toArray());
+          completedTasks.push(task.get('id'));
+        }
+      }
+      resultObj.push({
+        name: get(tag, 'name'),
+        pomodoros: allPomodoros 
+      });
+    }
+    return resultObj;
   }
 }

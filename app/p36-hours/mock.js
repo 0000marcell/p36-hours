@@ -71,7 +71,8 @@ export default {
   },
   constructDbFromObj(store, obj){
     return new rsvp.Promise((resolve) => {
-      let promises = [];
+      let promises = [],
+          allNewTasks = [];
       obj.tasks.forEach((task) => {
         promises.push(
           new rsvp.Promise((resolve) => {
@@ -79,6 +80,7 @@ export default {
               name: task.name,
               status: 'active'
             }).save().then((newTask) => {
+              allNewTasks.push(newTask);
               let savedPomodoros = [];
               task.pomodoros.forEach((pomodoro) => {
                 savedPomodoros.push(
@@ -96,7 +98,7 @@ export default {
         );
       });
       return rsvp.all(promises).then(() => {
-        resolve();
+        resolve(allNewTasks);
       });
     });
   },

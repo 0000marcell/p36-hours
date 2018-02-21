@@ -29,8 +29,7 @@ export default Controller.extend({
     });
   },
   actions: {
-    submit(){
-      let model = get(this, 'model');
+    submit(model){
       if(get(this, 'stateHelper').get('parentTask')){
         this.saveTaskWithParent(model);  
       }else{

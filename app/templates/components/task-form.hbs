@@ -11,7 +11,18 @@
   value=model.description  
   placeholder="description"
   cols="80" rows="6"}}
-{{input value=tagList}}
-{{#default-button onClick=submit}}
+{{#power-select-multiple  
+  selected=selectedTags
+  searchField="name"
+  selectedItemComponent="selected-item-tag"
+  onkeydown=(action "handleKeydown")
+  options=tags onchange=(action "selectTag") 
+  as |item|}}
+  <div class="flex-row inline-space-between">
+    {{item.name}}
+    <a {{action "removeTag" item bubbles=false}}>x</a>
+  </div>
+{{/power-select-multiple}}
+{{#default-button onClick=(action "submit")}}
   {{if isEdit 'edit' 'add'}}
 {{/default-button}}

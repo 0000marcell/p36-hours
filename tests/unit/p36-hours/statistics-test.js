@@ -1,6 +1,9 @@
+import { run } from '@ember/runloop';
+import { get } from '@ember/object';
 import { moduleFor, test } from 'ember-qunit';
 import statistics from 'p36-hours/p36-hours/statistics';
 import rsvp from 'rsvp';
+import mock from 'p36-hours/p36-hours/mock';
 
 
 function lastThreeMonthsDates(){
@@ -18,6 +21,29 @@ function lastThreeMonthsDates(){
 
 let dates = lastThreeMonthsDates();
 
+const obj = {
+    tasks: [
+      {
+        name: 'task 1',
+        status: 'active',
+        pomodoros: [
+          { date: new Date(2015, 1, 1) },
+          { date: new Date(2015, 1, 2) },
+          { date: new Date(2015, 1, 3) }
+        ]
+      },
+      {
+        name: 'task 2',
+        status: 'active',
+        pomodoros: [
+          { date: new Date(2015, 1, 1) },
+          { date: new Date(2015, 1, 2) },
+          { date: new Date(2015, 1, 3) }
+        ]
+      }
+    ]
+  };
+
 
 moduleFor('statistics',
   'Unit | p36-hours | statistics',{
@@ -33,6 +59,11 @@ moduleFor('statistics',
         )
       });
       await rsvp.all(saving);
+    },
+    async afterEach(){
+      await run(async () => {
+        await mock.deleteAll(this.store);
+      });
     }
 });
 
@@ -147,4 +178,53 @@ test('build radar chart data #unit-statistics-test-06',
     expected, 'load data for nestedTasks!');
 });
 
+let tagsObj = [
+  {name: 'tag 1'},
+  {name: 'tag 2'},
+  {name: 'tag 3'}
+];
 
+
+async function createTagsData(store){
+  let tasks;
+  await run(async () => {
+    tasks = await mock.constructDbFromObj(store, obj);
+  });
+  let tags = [];
+  for(let tag of tagsObj){
+    await run(async () => {
+      tags.push(
+        await store.createRecord('tag', {
+          name: tag.name,
+          tasks: tasks
+        }).save()
+      );
+    });
+  }
+  return tags;
+}
+
+test('radar chart from tags #unit-statistics-test-07', 
+  async function(assert){
+    let expected = [
+      [
+        {
+          "axis": "tag 1",
+          "value": 0.33
+        },
+        {
+          "axis": "tag 2",
+          "value": 0.33
+        },
+        {
+          "axis": "tag 3",
+          "value": 0.33
+        }
+      ]
+    ];
+    let tags = await createTagsData(this.store),
+        results = await statistics.radarChartDataBasedOnTags(tags);
+    assert.equal(results.length, 3);
+    assert.equal(results[0].pomodoros.length, 6) 
+    assert.deepEqual(await statistics.radarChart(results), expected);
+});
