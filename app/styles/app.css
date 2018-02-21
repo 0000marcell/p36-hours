@@ -10,6 +10,7 @@
 @import 'components/performance-info.css';
 @import 'components/calendar-chart.css';
 @import 'components/stream-chart.css';
+@import 'components/modal-dialog.css';
 @import 'fonts.css';
 
 html, body{

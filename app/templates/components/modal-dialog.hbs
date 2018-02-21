@@ -1,0 +1,26 @@
+<div {{action "close" false}} class="overlay">
+  <div class="box flex-column">
+    <div class="flex-row inline-end default-padding">
+      <a {{action "close" false}}>x</a>
+    </div>
+    <div class="flex-column inline-space-between full-height">
+      <div class="modal-dialog-msg flex-row inline-center default-padding">
+        <p>
+          {{msg}}
+        </p>
+      </div>
+      <div class="flex-row inline-end default-padding">
+        <div>
+          {{#default-button onClick=(action "close" true )}}
+            {{trueOptionText}}
+          {{/default-button}}
+          {{#default-button onClick=(action "close" false)}}
+            {{falseOptionText}}
+          {{/default-button}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

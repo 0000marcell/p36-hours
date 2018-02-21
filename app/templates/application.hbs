@@ -1,4 +1,12 @@
 <div class="default-padding">
   {{menu-bar}}
+  {{#if showDialog}}
+    {{modal-dialog 
+      msg="testing modal dialog"
+      trueOptionText="yes"
+      falseOptionText="no"
+      close=(action "closeDialog")}}
+  {{/if}}
+  <button {{action "showDialog"}}>showDialog</button>
 </div>
 {{outlet}}
