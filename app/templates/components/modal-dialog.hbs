@@ -5,18 +5,18 @@
     </div>
     <div class="flex-column inline-space-between full-height">
       <div class="modal-dialog-msg flex-row inline-center default-padding">
-        <p>
-          {{msg}}
-        </p>
+        {{yield}} 
       </div>
       <div class="flex-row inline-end default-padding">
         <div>
-          {{#default-button onClick=(action "close" true )}}
-            {{trueOptionText}}
-          {{/default-button}}
-          {{#default-button onClick=(action "close" false)}}
-            {{falseOptionText}}
-          {{/default-button}}
+          {{#if showButtons}}
+            {{#default-button onClick=(action "close" true )}}
+              {{trueOptionText}}
+            {{/default-button}}
+            {{#default-button onClick=(action "close" false)}}
+              {{falseOptionText}}
+            {{/default-button}}
+          {{/if}}
         </div>
       </div>
     </div>

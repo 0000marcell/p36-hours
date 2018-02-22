@@ -38,10 +38,12 @@ export default Component.extend({
     async submit(){
       let selectedTags = await get(this, 'selectedTags'),
           model = get(this, 'model');
-      for(let tag of selectedTags){
-        //tag.get('tasks').pushObject(model);
-        //tag = await tag.save()
-        model.get('tags').pushObject(tag);
+      if(selectedTags.length){
+        for(let tag of selectedTags){
+          //tag.get('tasks').pushObject(model);
+          //tag = await tag.save()
+          model.get('tags').pushObject(tag);
+        }
       }
       get(this, 'submit')(model);
     }

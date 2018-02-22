@@ -1,12 +1,29 @@
+{{#if showDialog}}
+  {{#modal-dialog 
+    msg="Do you really wish to load this data, all your previous data will be deleted, the app will automatically refresh after the data is loaded"
+    trueOptionText="load"
+    falseOptionText="cancel"
+    close=(action "confirmLoad")}}
+    {{#if loadingData}}
+      <p>loading...</p>
+    {{else}}
+      {{dialogMsg}}
+    {{/if}}
+  {{/modal-dialog}}
+{{/if}}
+<div class="flex-row backup default-padding">
+  {{#default-button onClick=(action "downloadData")}}
+    download data
+  {{/default-button}}
+  {{#x-file-input name="files" 
+    multiple=false
+    action=(action "didSelectFiles")}}
+    {{#default-button}}
+      upload data
+    {{/default-button}}
+  {{/x-file-input}}
+</div>
 <div class="default-padding">
   {{menu-bar}}
-  {{#if showDialog}}
-    {{modal-dialog 
-      msg="testing modal dialog"
-      trueOptionText="yes"
-      falseOptionText="no"
-      close=(action "closeDialog")}}
-  {{/if}}
-  <button {{action "showDialog"}}>showDialog</button>
 </div>
 {{outlet}}

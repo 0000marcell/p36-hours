@@ -1,5 +1,4 @@
 import { run } from '@ember/runloop';
-import { get } from '@ember/object';
 import { moduleFor, test } from 'ember-qunit';
 import statistics from 'p36-hours/p36-hours/statistics';
 import rsvp from 'rsvp';

@@ -1,3 +1,10 @@
+{{#if showDialog}}
+  {{modal-dialog 
+    msg="Your modifications were not saved yet, do you wish to exit anyway"
+    trueOptionText="yes(exit)"
+    falseOptionText="no(stay)"
+    close=(route-action "closeDialog")}}
+{{/if}}
 {{task-form model=model 
   isEdit=false
   submit=(action "submit")}}

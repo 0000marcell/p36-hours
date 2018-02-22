@@ -9,12 +9,10 @@ export default Route.extend({
       console.log(msg);
     });
     */
-    /*
     return hash({
       tasks: this.store.findAll('task'),
       pomodoros: this.store.findAll('pomodoro'),
       tags: this.store.findAll('tag')
     });
-    */
   }
 });
