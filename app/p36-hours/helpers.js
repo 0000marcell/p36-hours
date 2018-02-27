@@ -7,6 +7,12 @@ export default {
         diff = d.getDate() - day + (day == 0 ? -6:1); 
     return new Date(d.setDate(diff));
   },
+  currSunday(d){
+    d = new Date(d);
+    let day = d.getDay(),
+        diff = d.getDate() - day;
+    return new Date(d.setDate(diff));
+  },
   grabPathName(item){
     let path = [];
     if(get(item, 'parent.id'))

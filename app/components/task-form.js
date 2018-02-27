@@ -6,7 +6,7 @@ export default Component.extend({
   store: inject('store'),
   classNames: ['task-form'],
   selectedTags: computed(async function(){
-    return await get(this, 'model.tags');
+    return await get(this, 'model.tags').toArray();
   }),
   tags: computed(async function(){
     return await get(this, 'store').findAll('tag');

@@ -32,17 +32,17 @@ calendar-chart .day {
 }
 
 /* color ranges */
-.RdYlGn .q0-11{fill:rgb(165,0,38)}
-.RdYlGn .q1-11{fill:rgb(215,48,39)}
-.RdYlGn .q2-11{fill:rgb(244,109,67)}
-.RdYlGn .q3-11{fill:rgb(253,174,97)}
-.RdYlGn .q4-11{fill:rgb(254,224,139)}
-.RdYlGn .q5-11{fill:rgb(255,255,191)}
-.RdYlGn .q6-11{fill:rgb(217,239,139)}
-.RdYlGn .q7-11{fill:rgb(166,217,106)}
-.RdYlGn .q8-11{fill:rgb(102,189,99)}
-.RdYlGn .q9-11{fill:rgb(26,152,80)}
-.RdYlGn .q10-11{fill:rgb(0,104,55)}
+.RdYlGn .q0-11{fill:rgb(120,120,120)}
+.RdYlGn .q1-11{fill:rgb(130,130,130)}
+.RdYlGn .q2-11{fill:rgb(140,140,140)}
+.RdYlGn .q3-11{fill:rgb(150,150,150)}
+.RdYlGn .q4-11{fill:rgb(160,160,160)}
+.RdYlGn .q5-11{fill:rgb(170,170,170)}
+.RdYlGn .q6-11{fill:rgb(180,180,180)}
+.RdYlGn .q7-11{fill:rgb(190,190,190)}
+.RdYlGn .q8-11{fill:rgb(200,200,200)}
+.RdYlGn .q9-11{fill:rgb(210,210,210)}
+.RdYlGn .q10-11{fill:rgb(220,220,220)}
 
 /* hover info */
 #tooltip {

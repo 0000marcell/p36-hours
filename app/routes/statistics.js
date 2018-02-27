@@ -3,7 +3,7 @@ import statistics from '../p36-hours/statistics';
 import helpers from '../p36-hours/helpers';
 
 export default Route.extend({
-  setupController(controller, model){
+  async setupController(controller, model){
     this._super(...arguments);
     let twoWeeksAgo = new Date();
     twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 30);

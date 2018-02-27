@@ -1,4 +1,8 @@
-<h1>{{_internalTime}}</h1>
+<div class="flex-row inline-space-around clock-face">
+  <h3>36:00</h3>
+  <h2>6:00</h2>
+  <h1>{{_internalTime}}</h1>
+</div>
 {{#if (eq state 'stopped')}}
   {{#default-button onClick=(action "startClock")}}
     START

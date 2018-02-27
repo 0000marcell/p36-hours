@@ -1,15 +1,38 @@
 .default-clock{
   text-align: center;
-  height: 180px;
+}
+
+.default-clock .clock-face{
+  padding: 40px 0 40px 0;
 }
 
 .default-clock h1{
-  font-size: 72px;
+  font-size: 60px;
   margin: 0;
   letter-spacing: 15px;
+  font-weight: 500;
+}
+
+.default-clock h2{
+  font-size: 36px;
+  letter-spacing: 15px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.default-clock h3{
+  font-size: 24px;
+  letter-spacing: 15px;
+  font-weight: 500;
+  margin: 0;
 }
 
 .default-clock button{
-  width: 150px;
+  width: 177px;
   margin: 25px;
+  height: 42px;
+  font-size: 24px;
+  letter-spacing: 3px;
+  font-weight: 100;
+  border-right: 3px solid #333;
 }

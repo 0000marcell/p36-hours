@@ -1,6 +1,7 @@
 import Component from '@ember/component';
 import clock from '../p36-hours/clock';
 import { set, setProperties, get } from '@ember/object';
+import { inject } from '@ember/service';
 
 /**
  * @component default-clock
@@ -9,12 +10,16 @@ import { set, setProperties, get } from '@ember/object';
  * @param {Function} register 
  */
 export default Component.extend({
+  store: inject('store'),
   classNames: ['default-clock'],
   state: 'stopped',
   clock: null,
   parentController: null,
-  didReceiveAttrs(){
+  async didReceiveAttrs(){
     this._super(...arguments);
+    let weekTime = clock.verifyWeekTime(this.get('store')),
+        dayTIme = clock.verifyDayTime(this.get('store'));
+    
     set(this, '_internalTime', get(this, 'time'));
     get(this, 'register')(this);
   },

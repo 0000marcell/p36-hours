@@ -23,9 +23,9 @@ export default Component.extend({
         lastYear = Math.max(...years);
           
 
-    let width = 960,
+    let width = 550,
         height = 750,
-        cellSize = 25; 
+        cellSize = 15; 
 
     let no_months_in_a_row = Math.floor(width / (cellSize * 7 + 50)),
         shift_up = cellSize * 3;

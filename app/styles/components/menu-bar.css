@@ -1,4 +1,5 @@
 .menu-bar{
+  width: 100%;
   max-width: 665px;
   min-width: 300px;
 }
@@ -10,7 +11,8 @@
 }
 
 .menu-bar .active{
-  background-color: #f2f2f2;
+  background: linear-gradient(#fff, #f2f2f2);
+  border-bottom: 3px solid #333;
 }
 
 .menu-bar a{

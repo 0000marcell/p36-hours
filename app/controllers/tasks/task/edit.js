@@ -1,7 +1,9 @@
 import Controller from '@ember/controller';
-import { get } from '@ember/object';
+import { set, get, setProperties } from '@ember/object';
+import { inject } from '@ember/service';
 
 export default Controller.extend({
+  modalService: inject('modal-dialog'),
   actions: {
     submit(model){
       //let model = get(this, 'model');
@@ -12,10 +14,26 @@ export default Controller.extend({
       });
     },
     delete(){
-      let model = get(this, 'model');
-      model.destroyRecord().then(() => {
-        this.transitionToRoute('clock');
+      let model = get(this, 'model'),
+          modal = this.get('modalService.modal'),
+          msg = `Do you really wish to delete ${model.get('name')}
+        all data will be lost.`;
+      set(this, 'modal', modal);
+      setProperties(modal, {
+        showDialog: true,
+        dialogMsg: msg,
+        trueDialogText: 'yes',
+        falseDialogText: 'no',
+        dialogFunc: (del) => {
+          if(del){
+            model.destroyRecord().then(() => {
+              this.transitionToRoute('clock');
+            });
+          }
+          set(this, 'modal.showDialog', false);
+        }
       });
+      
     }
   }
 });

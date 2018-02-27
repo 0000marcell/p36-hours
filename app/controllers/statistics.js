@@ -27,6 +27,7 @@ export default Controller.extend({
       set(this, 'selectedItems', selection);
     },
     async buildData(){
+      set(this, 'isLoading', true);
       let items = get(this, 'selectedItems'),
           mode = get(this, 'selectedMode');
       if(mode === 'tasks'){
@@ -48,6 +49,7 @@ export default Controller.extend({
           statistics.radarChart(allTasks).then((radarChartData) => {
             set(this, 'radarChartData',
               radarChartData);
+            set(this, 'isLoading', false);
           });
         });
       }else{
@@ -57,6 +59,7 @@ export default Controller.extend({
           .then((data) => {
             statistics.radarChart(data).then((radarChartData) => {
               set(this, 'radarChartData', radarChartData);
+              set(this, 'isLoading', false);
             });
           });
 

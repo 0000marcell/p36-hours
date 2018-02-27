@@ -1,22 +1,29 @@
 .tree-view-item{
-  max-width: 523px;
-  //height: 32px;
   list-style-type: none;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
+  font-weight: 300;
 }
 
-.tree-view-item .item-name:hover{
+.tree-view-item .selected {
+  background-color: #f2f2f2 !important;
+  border-left: 3px solid #333;
+}
+
+.tree-view-item .item-name{
+}
+
+.tree-view-item .item-row:hover{
   cursor: pointer;
 }
 
 .tree-view-item .item-row{
   height: 23px;
   //background-color: #f2f2f2;
-  padding: 9px 10px 0 25px;
+  padding: 9px 10px 0 10px;
 }
 
 .tree-view-item .item-controls{
-  width: 100px;
+  width: 70px;
 }
 
 .tree-view-item ul{
@@ -25,6 +32,7 @@
 
 .tree-view-item a{
   text-decoration: underline;
+  color: #333;
 }
 
 .tree-view-item a:hover{

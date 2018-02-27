@@ -32,16 +32,26 @@
       {{/default-button}}   
     </div>
   </div>
-  <div class="default-padding">
-    {{calendar-chart data=calendarChartData}}
-  </div>
-  <div class="default-padding">
-    {{radar-chart data=radarChartData}}
-  </div>
-  <!--
-  <div class="default-padding">
-    {{stream-chart}}
-  </div>
-  -->
-  {{outlet}}
+  {{#if isLoading}}
+    <div class="loading-section">
+      <div class="loader-inner ball-scale-multiple">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+  {{else}}
+    <div class="default-padding">
+      {{calendar-chart data=calendarChartData}}
+    </div>
+    <div class="default-padding">
+      {{radar-chart data=radarChartData}}
+    </div>
+    <!--
+    <div class="default-padding">
+      {{stream-chart}}
+    </div>
+    -->
+    {{outlet}}
+  {{/if}}
 </div>

@@ -36,3 +36,10 @@ test(`return string of the
   assert.deepEqual(['task 1'], 
     helpers.grabPathName(withNoParents))
 });
+
+test('get sunday of the given date #unit-helpers-test-03', function(assert){
+  let date = new Date(2015, 1, 3);
+  let result = helpers.currSunday(date);
+  assert.deepEqual(result, 
+    new Date(2015, 1, 1));
+});

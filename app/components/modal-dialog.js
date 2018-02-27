@@ -3,7 +3,7 @@ import { get, set } from '@ember/object';
 
 export default Component.extend({
   classNames: ['modal-dialog'],
-  showButtons: true,
+  hideButtons: false,
   actions: {
     close(result){
       set(this, 'showButtons', false);

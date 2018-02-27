@@ -9,7 +9,7 @@
       </div>
       <div class="flex-row inline-end default-padding">
         <div>
-          {{#if showButtons}}
+          {{#if (eq hideButtons false)}}
             {{#default-button onClick=(action "close" true )}}
               {{trueOptionText}}
             {{/default-button}}

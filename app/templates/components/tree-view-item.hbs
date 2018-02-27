@@ -1,15 +1,17 @@
-<div class="flex-row inline-space-between item-row">
-  <div class="item-name" {{action "select" data}}>
+<div class="flex-row inline-space-between item-row" 
+  {{action "select" data}}>
+  <div class="item-name" >
     {{data.name}}
   </div>
   <div class="flex-row inline-space-between item-controls">
     <div>
       {{link-to "" "tasks.task.edit" data 
         class="icon icon-edit-modify-streamline"}}
-      <a {{action "add" data}} class="icon icon-plus"></a>
+      <a {{action "add" data bubbles=false}} 
+        class="icon icon-plus"></a>
     </div>
     <div>
-      <a {{action "expand"}} class={{expandClass}}></a>
+      <a {{action "expand" bubbles=false}} class={{expandClass}}></a>
     </div>
   </div>
 </div>

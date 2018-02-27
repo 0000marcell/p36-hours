@@ -11,12 +11,10 @@ moduleFor('mock',
       this.store = this.container.lookup('service:store');
     },
     async afterEach(){
-      /*
       await run(async () => {
         await mock.deleteAll(this.store);
         return "done";
       });
-      */
     }
 });
 

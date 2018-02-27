@@ -6,7 +6,7 @@ import helpers from '../p36-hours/helpers';
 
 export default Controller.extend({
   intervals: 0, 
-  time: "00:10",
+  time: "25:00",
   _clockStatus: 'active',
   stateHelper: inject('state-helper'),
   tabOptions: [{value: 'active', text: 'active', selected: true}, 

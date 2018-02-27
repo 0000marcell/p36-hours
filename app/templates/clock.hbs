@@ -1,17 +1,24 @@
-<div class="flex-row inline-center default-padding">
-  {{task-path paths=taskPath}}
+<div class="flex-row inline-center">
+  <div class="app-body">
+    <div class="flex-row inline-center default-padding">
+      {{task-path paths=taskPath}}
+    </div>
+    <div class="default-padding">
+      {{default-clock time=time 
+        finished=(action "timerFinished") 
+        register=(action "registerClock")}}
+    </div>
+    <div class="default-padding">
+      {{default-tabs options=tabOptions select=(action "taskStatus")}}
+    </div>
+    <div class="search-bar default-padding">
+      {{input value=searchTerm placeholder="search"}}
+    </div>
+    <div class="default-padding">
+      {{tree-view data=filteredTasks select=(action "select")
+        add=(action "add")}}
+    </div>
+    {{outlet}}
+  </div>
 </div>
-<div class="default-padding">
-  {{default-clock time=time 
-    finished=(action "timerFinished") 
-    register=(action "registerClock")}}
-</div>
-<div class="default-padding">
-  {{default-tabs options=tabOptions select=(action "taskStatus")}}
-</div>
-<div class="default-padding">
-  {{tree-view isLoading=isLoading 
-    data=filteredTasks select=(action "select")
-    add=(action "add")}}
-</div>
-{{outlet}}
+
