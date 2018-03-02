@@ -1,0 +1,8 @@
+{{#if (gt signal 0)}}
+  <i class="icon icon-up-open-big"></i>
+{{else if (eq signal 0)}}
+  <i class="icon icon-dash"></i>
+{{else}}
+  <i class="icon icon-down-open-big"></i>
+{{/if}}
+<p>{{text}}</p>

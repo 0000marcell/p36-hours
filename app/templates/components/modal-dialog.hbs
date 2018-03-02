@@ -1,0 +1,36 @@
+<div {{action "close" false}} 
+  data-test-close-button=true
+  class="overlay">
+  <div class="box flex-column">
+    <div class="flex-row inline-end default-padding">
+      <a {{action "close" false}}>x</a>
+    </div>
+    <div class="flex-column inline-space-between full-height">
+      <div class="modal-dialog-msg flex-row inline-center default-padding">
+        {{yield}} 
+      </div>
+      <div class="flex-row inline-end default-padding">
+        <div>
+          {{#if (eq hideButtons false)}}
+            {{#if infoMode}}
+              {{#default-button 
+                data-test-ok-button=true
+                onClick=(action "close" true )}}
+                {{trueOptionText}}
+              {{/default-button}}
+            {{else}}
+              {{#default-button onClick=(action "close" true )}}
+                {{trueOptionText}}
+              {{/default-button}}
+              {{#default-button onClick=(action "close" false)}}
+                {{falseOptionText}}
+              {{/default-button}}
+            {{/if}}
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

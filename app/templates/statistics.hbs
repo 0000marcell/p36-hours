@@ -1,0 +1,57 @@
+<div class="statistics">
+  <div class="flex-row inline-center default-padding">
+    {{line-chart data=lineChartData}}
+  </div>
+  <div class="flex-row inline-center default-padding">
+    <div class="flex-column">
+      {{performance-info text=lastWeekText 
+        signal=lastWeekComparison}}
+      {{performance-info text=lastMonthText
+        signal=lastMonthComparison}}
+    </div>
+  </div>
+  <div class="flex-row inline-center default-padding">
+    <div class="flex-column">
+      <h3>mode:</h3>
+      {{#power-select  
+        selected=selectedMode
+        options=modes onchange=(action "selectMode") 
+        as |mode|}}
+        {{mode}}
+      {{/power-select}}
+      <h3>{{selectedMode}}:</h3>
+      {{#power-select-multiple  
+        selected=selectedItems
+        searchField="name"
+        options=modeItems onchange=(action "selectItems") 
+        as |item|}}
+        {{item.name}}
+      {{/power-select-multiple}}
+      {{#default-button onClick=(action 'buildData')}}
+        load charts
+      {{/default-button}}   
+    </div>
+  </div>
+  {{#if isLoading}}
+    <div class="loading-section">
+      <div class="loader-inner ball-scale-multiple">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+  {{else}}
+    <div class="default-padding">
+      {{calendar-chart data=calendarChartData}}
+    </div>
+    <div class="default-padding">
+      {{radar-chart data=radarChartData}}
+    </div>
+    <!--
+    <div class="default-padding">
+      {{stream-chart}}
+    </div>
+    -->
+    {{outlet}}
+  {{/if}}
+</div>

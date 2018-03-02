@@ -1,0 +1,12 @@
+.statistics{
+  height: 1500px;
+}
+
+.statistics p{
+  letter-spacing: 3px;
+}
+
+.statistics button{
+  margin-top: 25px;
+  font-size: 24px;
+}

@@ -1,0 +1,4 @@
+{{#each options as |option|}}
+  <button class={{if option.selected 'tab selected' 'tab'}} 
+   {{action "select" option}}>{{option.text}}</button>
+{{/each}}

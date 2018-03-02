@@ -1,0 +1,135 @@
+@import 'flex.css';
+@import 'statistics.css';
+@import 'loading.css';
+@import 'components/menu-bar.css';
+@import 'components/task-path.css';
+@import 'components/default-button.css';
+@import 'components/default-clock.css';
+@import 'components/default-tabs.css';
+@import 'components/tree-view.css';
+@import 'components/tree-view-item.css';
+@import 'components/task-form.css';
+@import 'components/performance-info.css';
+@import 'components/calendar-chart.css';
+@import 'components/stream-chart.css';
+@import 'components/modal-dialog.css';
+@import 'fonts.css';
+@import 'loader.min.css';
+
+html, body{
+  margin: 0 auto;
+  //max-width: 665px;
+  //min-width: 300px;
+  //padding-top: 30px;
+  font-family: "Nitti Grotesk",Helvetica,Arial,sans-serif;
+}
+
+.x-file--input{
+  display: none;
+}
+
+
+.default-padding{
+  padding: 10px;
+}
+
+input{
+  width: 370px;
+  height: 43px;
+  margin: 10px 0 10px 0;
+  border: 3px solid #222;
+  font-size: 24px;
+  letter-spacing: 4px;
+  padding-left: 25px;
+}
+
+textarea{
+  width: 370px;
+  margin: 10px 0 10px 0;
+  border: 3px solid #222;
+  font-size: 24px;
+  letter-spacing: 4px;
+  padding-left: 25px;
+}
+
+.ember-power-select-trigger{
+  width: 370px;
+  min-height: 43px;
+  border: 3px solid #222 !important;
+  border-radius: 0;
+  letter-spacing: 3px;
+  font-size: 24px;
+  overflow: hidden;
+}
+
+.ember-power-select-trigger:focus {
+  outline: 0;
+}
+
+.ember-basic-dropdown-content{
+  border-radius: 0;
+  border: 3px solid #222 !important;
+  margin-top: 3px;
+  letter-spacing: 3px;
+}
+
+.ember-power-select-trigger-multiple-input{
+  margin: 0 0 0 10px;
+  letter-spacing: 0;
+}
+
+.ember-power-select-multiple-option{
+  background-color: #f2f2f2;
+}
+
+h3{
+  letter-spacing: 3px;
+  font-size: 24px;
+  font-weight: 100;
+  margin-bottom: 10px;
+}
+
+.loading-container img{
+  display: block;
+  width: 300px;
+  margin: 0 auto;
+}
+
+.backup {
+  padding-bottom: 40px;
+}
+
+.backup button{
+  margin-left: 10px;
+  width: 130px;
+  height: 30px;
+  font-size: 14px;
+}
+
+.ball-scale-multiple div {
+  background-color: #c8c8c8;
+}
+
+.app-body{
+  width: 100%;
+  max-width: 665px;
+  min-width: 300px;
+}
+
+.search-bar input{
+  width: 100%;
+  height: 43px;
+  margin: 10px 0 10px 0;
+  border: 3px solid #222;
+  font-size: 24px;
+  letter-spacing: 4px;
+  padding-left: 10px;
+}
+
+input:focus {
+  outline-width: 0;
+}
+
+textarea:focus {
+  outline-width: 0;
+}

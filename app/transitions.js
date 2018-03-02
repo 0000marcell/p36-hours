@@ -1,0 +1,20 @@
+export default function(){
+  this.transition(
+    this.fromRoute('clock'),
+    this.toRoute('statistics'),
+    this.use('toLeft'),
+    this.reverse('toRight')
+  );
+  this.transition(
+    this.fromRoute('clock'),
+    this.toRoute('tasks'),
+    this.use('toLeft'),
+    this.reverse('toRight')
+  );
+  this.transition(
+    this.fromRoute('statistics'),
+    this.toRoute('tasks'),
+    this.use('toLeft'),
+    this.reverse('toRight')
+  );
+}

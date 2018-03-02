@@ -1,0 +1,30 @@
+{{#if modal.showDialog}}
+  {{#modal-dialog 
+    trueOptionText=modal.trueDialogText
+    falseOptionText=modal.falseDialogText
+    hideButtons=modal.hideButtons
+    infoMode=modal.infoMode
+    close=(action modal.dialogFunc)}}
+    {{modal.dialogMsg}}
+  {{/modal-dialog}}
+{{/if}}
+<div class="flex-row backup default-padding">
+  {{#x-file-input name="files" 
+    multiple=false
+    action=(action "didSelectFiles")}}
+    {{#default-button}}
+      <i class="icon icon-upload">
+      </i>
+      load 
+    {{/default-button}}
+  {{/x-file-input}}
+  {{#default-button onClick=(action "downloadData")}}
+    <i class="icon icon-download">
+    </i>
+    download
+  {{/default-button}}
+</div>
+<div class="flex-row inline-center default-padding">
+  {{menu-bar}}
+</div>
+{{liquid-outlet}}
