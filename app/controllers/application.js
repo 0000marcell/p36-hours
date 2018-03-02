@@ -31,6 +31,7 @@ export default Controller.extend({
       },
       trueDialogText: 'load',
       falseDialogText: 'cancel',
+      infoMode: false
     }
     set(this, 'modal', modal);
     modalService.set('modal', modal);
@@ -39,8 +40,8 @@ export default Controller.extend({
     didSelectFiles(files){
       let modal = this.get('modal');
       if(files[0]){
+        set(this, 'selectedFile', files[0]);
         setProperties(modal, {
-          selectedFile: files[0],
           showDialog: true,
           dialogMsg: "Do you really wish to load this data, all your previous data will be deleted, the app will automatically refresh after the data is loaded",
           dialogFunc: (load) => {
@@ -53,8 +54,9 @@ export default Controller.extend({
               read.onloadend = async () => {
                 let json = JSON.parse(read.result);
                 await mock.deleteAll(store);
+                console.log('json: ', json);
                 await mock.constructDbFromObj(store, json);
-                //window.location.reload();
+                window.location.reload();
               }
             }
             set(this, 'modal.showDialog', false);
@@ -69,8 +71,12 @@ export default Controller.extend({
         hideButtons: true,
         dialogMsg: 'creating backup file...'
       });
-      let json = await mock.backupData(get(this, 'store'));
-      download('backup.json', JSON.stringify(json));
+      let json = await mock.backupData(get(this, 'store')),
+          today = new Date(),
+          date = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
+
+      download(`p36-${date}.json`, JSON.stringify(json));
+
       setProperties(modal, {
         showDialog: false,
         hideButtons: false 

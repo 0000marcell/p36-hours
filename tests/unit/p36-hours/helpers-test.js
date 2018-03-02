@@ -43,3 +43,11 @@ test('get sunday of the given date #unit-helpers-test-03', function(assert){
   assert.deepEqual(result, 
     new Date(2015, 1, 1));
 });
+
+test('compare two dates #unit-helpers-test-04', function(assert){
+  let date1 = new Date(2015, 1, 1),
+      date2 = new Date(2015, 1, 1);
+  date1.setHours(1, 1, 1, 1);
+  assert.ok(helpers.compareDates(date1, date2));
+  assert.notEqual(date1.getTime(), date2.getTime());
+});

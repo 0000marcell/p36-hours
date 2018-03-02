@@ -1,5 +1,9 @@
+import { run } from '@ember/runloop';
 import helpers from 'p36-hours/p36-hours/helpers';
 import { set, get } from '@ember/object';
+
+const HOUR = 3600,
+      MIN = 60;
 
 export default {
   start(time, cb, finished){
@@ -22,81 +26,112 @@ export default {
     this.interval = setInterval(this.clockTick.bind(this), 1000);
   },
   clockTick(){
-    let sec = this.convertToSec(this.time),
-        result  = sec - 1;
-    if(result < 0){
+    let pom = this.convertToSec(this.time.pomodoro, 'min') - 1,
+        day = this.convertToSec(this.time.day, 'hour') + 1,
+        week = this.convertToSec(this.time.week, 'hour') + 1;
+    if(pom < 0){
       clearInterval(this.interval);
       this.finished()
     }else{
-      this.time = this.convertToMin(result);
+      this.time = {
+        pomodoro: this.convertToMin(pom),
+        day: this.convertToHour(day),
+        week: this.convertToHour(week)
+      }
       this.cb(this.time);
     }
   },
-  convertToSec(time){
+  convertToSec(time, format){
     let splitTime = time.split(':');
     splitTime = splitTime.map((val) => ( parseInt(val)));
-    return splitTime[0] * 60 + splitTime[1];
+    if(format === 'min'){
+      return splitTime[0] * MIN + splitTime[1];
+    }else if(format === 'hour'){
+      return splitTime[0] * HOUR + splitTime[1] * MIN + splitTime[2];
+    }
+    
   },
   convertToMin(time){
-    let min = Math.floor(time/ 60),
-        sec = time % 60,
+    let min = Math.floor(time/ MIN),
+        sec = time % MIN,
         paddingZero = '';
     if(sec < 10)
       paddingZero = '0';
     return `${min}:${paddingZero}${sec}`;
   },
   convertToHour(time){
-    let min = +this.convertToMin(time).split(':')[0],
+    let splitStr = this.convertToMin(time).split(':'),
+        min = +splitStr[0],
+        sec = +splitStr[1],
         hours = 0;
+
     if(min > 59){
-      hours = Math.floor(min/ 60),
-          min = min % 60;
+      hours = Math.floor(min/ MIN),
+          min = min % MIN;
     }
     if(hours < 10)
-        hours = `0${hours}`;
+      hours = `0${hours}`;
     if(min < 10)
-        min = `0${min}`;
-    return `${hours}:${min}`;
+      min = `0${min}`;
+    if(sec < 10)
+      sec = `0${sec}`;
+    return `${hours}:${min}:${sec}`;
   },
   async getDayHCount(store){
-    let times = await store.findAll('time'),
-        dayCount = times.find((time) => {
-          return get(time, 'name') === 'day';
-        }); 
-    console.log('dayCount: ', dayCount);
+    let dayCount;
+    let times = await store.findAll('time');
+    dayCount = times.findBy('name', 'day');
+  
     if(!dayCount){
-      dayCount = await store.createRecord('time', {
-        name: 'day',
-        date: new Date(),
-        time: 0
-      }).save();
+      await run(async () => {
+        dayCount = await store.createRecord('time', {
+          name: 'day',
+          date: new Date(),
+          time: 0
+        }).save();
+      });
     }
 
     let dayCountDate = new Date(get(dayCount, 'date')),
         today = new Date();
-    today.setHours(0, 0, 0, 0);
-    dayCountDate.setHours(0, 0, 0, 0);
-    if(dayCountDate.getTime() !== today.getTime()){
-      set(dayCount, 'date', new Date());
-      set(dayCount, 'time', 0);
-      await dayCount.save()
+    if(!helpers.compareDates(dayCountDate, today)){
+      await run(async () => {
+        set(dayCount, 'date', new Date());
+        set(dayCount, 'time', 0);
+        await dayCount.save();
+      });
     }
     return this.convertToHour(get(dayCount, 'time'));
   },
   async getWeekHCount(store){
-    let times = await store.findAll('time'),
-        weekCount = times.findBy('name', 'week'),
-        weekCountDate = new Date(weekCount.get('date')),
+    let weekCount;
+    let times = await store.findAll('time');
+
+    weekCount = times.findBy('name', 'week');
+
+    if(!weekCount){
+      await run(async () => {
+        weekCount = await store.createRecord('time', {
+          name: 'week',
+          date: new Date(),
+          time: 0
+        }).save();
+      });
+    } 
+      
+    let weekCountDate = new Date(weekCount.get('date')),
         today = new Date(),
         weekCountSunday = helpers.currSunday(weekCountDate),
         thisWeekSunday = helpers.currSunday(today);
-    weekCountSunday.setHours(0, 0, 0, 0);
-    thisWeekSunday.setHours(0, 0, 0, 0);
-    if(weekCountSunday.getTime() !== thisWeekSunday.getTime()){
-      weekCount.set('date', new Date());
-      weekCount.set('time', 0);
-      await weekCount.save();
+
+    if(!helpers.compareDates(weekCountSunday, thisWeekSunday)){
+      await run(async () => {
+        set(weekCount, 'date', new Date());
+        set(weekCount, 'time', 0);
+        await weekCount.save();
+      });
     }
-    return this.convertToHour(weekCount.get('time'));
+
+    return this.convertToHour(get(weekCount, 'time'));
   }
 }

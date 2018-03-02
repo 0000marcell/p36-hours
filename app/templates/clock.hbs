@@ -4,9 +4,12 @@
       {{task-path paths=taskPath}}
     </div>
     <div class="default-padding">
-      {{default-clock time=time 
-        finished=(action "timerFinished") 
-        register=(action "registerClock")}}
+      {{default-clock 
+        time=time 
+        startFunc=(action "start")
+        finishFunc=(action "timerFinished")
+        registerFunc=(action "register")
+        }}
     </div>
     <div class="default-padding">
       {{default-tabs options=tabOptions select=(action "taskStatus")}}

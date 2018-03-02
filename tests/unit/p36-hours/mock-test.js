@@ -3,18 +3,16 @@ import { moduleFor, test } from 'ember-qunit';
 import { get } from '@ember/object';
 import mock from 'p36-hours/p36-hours/mock';
 import rsvp from 'rsvp';
+import helper from '../../helpers/store';
 
 moduleFor('mock',
   'Unit | p36-hours | mock',{
     integration: true,
     beforeEach(){
       this.store = this.container.lookup('service:store');
+      helper.setStore(this.store);
     },
     async afterEach(){
-      await run(async () => {
-        await mock.deleteAll(this.store);
-        return "done";
-      });
     }
 });
 
@@ -54,6 +52,7 @@ const obj = {
   };
 
 test('create one task in the store based on a object #unit-mock-test-01', async function(assert) {
+  
   await run(async () => {
     let taskObj = obj.tasks[0],
         task = await mock.createTask(this.store, taskObj, []);
@@ -94,21 +93,79 @@ test('build store from obj #unit-mock-test-02', async function(assert){
   });
 });
 
+test('#unit-mock-test-00', 
+  async function(assert){
+  let obj = {
+    tasks: [
+      {
+        name: 'task 1',
+        status: 'active',
+        pomodoros: [
+          { date: new Date(2015, 1, 1) },
+          { date: new Date(2015, 1, 2) },
+          { date: new Date(2015, 1, 3) }
+        ],
+        tags: []
+      }
+    ]
+  }
+  
+  await run(async () => {
+    await mock.constructDbFromObj(this.store, obj);
+  });
+  
+  let tasks = await this.store.findAll('task'),
+      pomodoros = await this.store.findAll('pomodoro');
+
+  console.log('pomodoros: ', pomodoros.get('length'));
+
+  await run(async () => {
+    await pomodoros.objectAt(0).destroyRecord();
+    console.log('deleted the first!');
+    await run(async () => {
+      await pomodoros.objectAt(1).destroyRecord();
+      console.log('deleted the second!');
+      await run(async () => {
+        await pomodoros.objectAt(2).destroyRecord();
+        console.log('deleted the third pomodoro!');
+        await run(async () => {
+          await tasks.objectAt(0).destroyRecord();
+          console.log('task was deleted!');
+          let resultObj = await 
+            helper.checkStore(['task', 'pomodoro']);
+          assert.equal(resultObj.task.length, 0);
+          assert.equal(resultObj.pomodoro.length, 0);
+          resolve();
+        });
+      });
+    });
+  });
+  /*
+  return new rsvp.Promise((resolve) => {
+    setTimeout(async () => {
+      let resultObj = await helper.checkStore(['task', 'pomodoro']);
+      console.log('gonna check the store!');
+      assert.equal(resultObj.task.length, 0, 'no task');
+      assert.equal(resultObj.pomodoro.length, 0, 'no pomodoro');
+      resolve();
+    }, 1000)
+  });
+  */
+});
+
 test('delete all tasks, pomodoros and tags #unit-mock-test-03', 
   async function(assert){
     await run(async () => {
+      let models = ['pomodoro', 'tag', 'time'];
+
       await mock.constructDbFromObj(this.store, obj);
-      await mock.deleteAll(this.store)
-      console.log('gonna test the cases!');
-      let tasks = await this.store.findAll('task');
-      assert.equal(tasks.get('length'), 0, 'no tasks');
+      await mock.deleteAll2(this.store, models);
 
-      let pomodoros = await this.store.findAll('pomodoro')
-      assert.equal(pomodoros.get('length'), 0, 
-        'no pomodoros');
+      let resultStore = await helper.checkStore(models);
 
-      let tags = await this.store.findAll('tag');
-      assert.equal(tags.get('length'), 0, 'no tags');
+      assert.equal(resultStore.pomodoro.length, 0, 'no pomodoros');
+      assert.equal(resultStore.tag.length, 0, 'no tags');
+      assert.equal(resultStore.task.length, 0, 'no tasks');
     });
 });
 

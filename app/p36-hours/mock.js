@@ -1,6 +1,8 @@
 import rsvp from 'rsvp';
+import { run } from '@ember/runloop';
 
 export default {
+  /*
   deleteTask(task){
     return new rsvp.Promise((resolve) => {
       let deletedPomodoros = [];
@@ -16,6 +18,17 @@ export default {
       });
     });
   },
+  */
+  async deleteAll2(store, models){
+    for(let model of models){
+      let records = await store.findAll(model);
+      for(let record of records.toArray()){
+        await run(async () => {
+          await record.destroyRecord();
+        });
+      }
+    }
+  },
   deleteAll(store){
     return new rsvp.Promise((resolve) => {
       let deleting = [];
@@ -24,7 +37,6 @@ export default {
           let deletedPomodoros = [];
           return store.findAll('pomodoro').then((pomodoros) => {
             if(pomodoros.get('length')){
-              console.log('gonna delete all pomodoros');
               pomodoros.map((pomodoro) => {
                 deletedPomodoros.push(pomodoro.destroyRecord());
               });
@@ -40,7 +52,6 @@ export default {
           let deletedTags = [];
           return store.findAll('tag').then((tags) => {
             if(tags.get('length')){
-              console.log('gonna delete all tags');
               tags.map((tag) => {
                 deletedTags.push(
                   tag.destroyRecord()

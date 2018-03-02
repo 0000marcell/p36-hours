@@ -5,31 +5,28 @@ import { inject } from '@ember/service';
 
 /**
  * @component default-clock
- * @param {Function} finished 
- * @param {String} time 
- * @param {Function} register 
+ * @param {Object} time
+ * @param {Function} startFunc
+ * @param {Function} finishFunc
  */
 export default Component.extend({
+  intervals: 0,
   store: inject('store'),
   classNames: ['default-clock'],
   state: 'stopped',
   clock: null,
   parentController: null,
-  async didReceiveAttrs(){
+  init(){
     this._super(...arguments);
-    let weekTime = clock.verifyWeekTime(this.get('store')),
-        dayTIme = clock.verifyDayTime(this.get('store'));
-    
-    set(this, '_internalTime', get(this, 'time'));
-    get(this, 'register')(this);
+    get(this, 'registerFunc')(this);
   },
-  start(startTime){
+  start(){
+    set(this, '_timeBeforeStart', get(this, 'time'));
     setProperties(this, {
-      _internalTime: startTime,
-      clock: clock.start(startTime, (time) => {
-        set(this, '_internalTime', time);
+      clock: clock.start(get(this, 'time'), (time) => {
+        set(this, 'time', time);
       }, () => {
-        get(this, 'finished')();
+        get(this, 'finishFunc')(this);
       }),
       state: 'started'
     });
@@ -37,25 +34,25 @@ export default Component.extend({
   reset(){
     get(this, 'clock').reset(() => {
       setProperties(this, {
-        _internalTime: get(this, 'time'),
+        time: get(this, '_timeBeforeStart'),
         state: 'stopped'
       });
     });
   },
   actions: {
     startClock(){
-      get(this, 'parentController').requestStart();
+      get(this, 'startFunc')(this);
     },
     pauseClock(){
       get(this, 'clock').pause((time) => {
         setProperties(this, {
-          _internalTime: time,
+          time: time,
           state: 'paused'
         });
       })
     },
     resetClock(){
-      this.reset();
+      this.reset(); 
     },
     resumeClock(){
       get(this, 'clock').resume();
