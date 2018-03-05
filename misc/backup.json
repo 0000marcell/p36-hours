@@ -1,0 +1,24 @@
+{
+  "tasks": [
+    {
+      "name": "task 1",
+      "status": "active",
+      "pomodoros": [
+        { "date": "Sun Feb 01 2015 00:00:00 GMT-0200 (BRST)" },
+        { "date": "Sun Feb 02 2015 00:00:00 GMT-0200 (BRST)" },
+        { "date": "Sun Feb 03 2015 00:00:00 GMT-0200 (BRST)" }
+      ],
+      "tags": ["javascript", "ruby"]
+    },
+    {
+      "name": "task 2",
+      "status": "active",
+      "pomodoros": [
+        { "date": "Sun Feb 01 2015 00:00:00 GMT-0200 (BRST)" },
+        { "date": "Sun Feb 02 2015 00:00:00 GMT-0200 (BRST)" },
+        { "date": "Sun Feb 03 2015 00:00:00 GMT-0200 (BRST)" }
+      ],
+      "tags": ["javascript", "ruby"]
+    }
+  ]
+}
