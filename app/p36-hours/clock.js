@@ -81,7 +81,6 @@ export default {
     let dayCount;
     let times = await store.findAll('time');
     dayCount = times.findBy('name', 'day');
-  
     if(!dayCount){
       await run(async () => {
         dayCount = await store.createRecord('time', {

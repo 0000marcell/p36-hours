@@ -1,34 +1,21 @@
 import Controller from '@ember/controller';
 import { get, set, setProperties } from '@ember/object';
+import { alias } from '@ember/object/computed';
 import filter from '../p36-hours/filters';
-import clock from '../p36-hours/clock';
 import { inject } from '@ember/service';
 
 export default Controller.extend({
+  time: alias('clock.time'),
   modalService: inject('modal-dialog'),
-  intervals: 0, 
+  clock: inject('clock-service'),
   async init(){
     this._super(...arguments);
-    set(this, 'time', {
-      day: "00:00:00",
-      week: "00:00:00",
-      pomodoro: "25:00"
-    });
-    let store = get(this, 'store'),
-        dayHCount = await clock.getDayHCount(store),
-        weekHCount = await clock.getWeekHCount(store);
-    let timeObj = {
-      day: dayHCount,
-      week: weekHCount,
-      pomodoro: '25:00'
-    };
-    set(this, 'time', timeObj);
     let modal = get(this, 'modalService.modal');
+    get(this, 'clock');
     set(this, 'modal', modal);
     setProperties(modal, {
       trueDialogText: 'yes',
-      falseDialogText: 'no',
-      
+      falseDialogText: 'no'
     });
   },
   stateHelper: inject('state-helper'),
@@ -47,12 +34,12 @@ export default Controller.extend({
     set(this, 'selectedTask', item);
   },
   actions: {
-    start(clock){
+    start(){
+      let clock = get(this, 'clock');
       if(get(this, 'selectedTask')){
         clock.start();
       }else{
         let modal = get(this, 'modal');
-        modal.set
         setProperties(modal, {
           infoMode: true,
           trueDialogText: "Ok",
@@ -63,6 +50,15 @@ export default Controller.extend({
           showDialog: true
         });
       }
+    },
+    pause(){
+      get(this, 'clock').pause();
+    },
+    resume(){
+      get(this, 'clock').resume();
+    },
+    reset(){
+      get(this, 'clock').reset();
     },
     select(item){
       let clock = get(this, 'clock'),
@@ -95,7 +91,7 @@ export default Controller.extend({
       get(this, 'stateHelper').set('parentTask', item);
       this.transitionToRoute('tasks.new');
     },
-    async timerFinished(clock){
+    async timerFinished(){
       let pomodoro = this.get('store').createRecord('pomodoro'),
           selectedTask = get(this, 'selectedTask');
       pomodoro.set('date', new Date());
@@ -105,21 +101,21 @@ export default Controller.extend({
         await pomodoro.save();
       });
 
-      let time = get(this, 'time');
-      if(get(clock, 'state') === 'active'){
-        set(this, 'intervals', get(this, 'intervals') + 1);
-        time.pomodoro = !(get(this, 'intervals') % 3) ? '10:00' :
+      let clock = get(this, 'clock'),
+          time = get(clock, 'time');
+      if(get(clock, 'state') === 'started'){
+        let pomodoros = await this.get('store').findAll('pomodoro'),
+            todayPomodoros = filter
+              .pomodorosHaveDate(pomodoros, new Date());
+
+        time.pomodoro = !(todayPomodoros.length % 3) ? '10:00' :
                                                         '5:00'
-        set(clock, 'state', 'interval');
-        set(this, 'time', time);
+        set(clock, 'time', time);
       }else{
         time.pomodoro = '25:00';
-        set(this, 'time', time);
+        set(clock, 'time', time);
       }
       clock.start();
-    },
-    register(clock){
-      set(this, 'clock', clock);
     }
   }
 });

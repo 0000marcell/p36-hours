@@ -2,6 +2,7 @@
   list-style-type: none;
   letter-spacing: 3px;
   font-weight: 300;
+  width: 100%;
 }
 
 .tree-view-item .selected {
@@ -17,9 +18,8 @@
 }
 
 .tree-view-item .item-row{
-  height: 23px;
-  //background-color: #f2f2f2;
-  padding: 9px 10px 0 10px;
+  height: 33px;
+  padding: 20px 10px 0 25px;
 }
 
 .tree-view-item .item-controls{

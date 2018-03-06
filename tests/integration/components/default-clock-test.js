@@ -10,14 +10,8 @@ moduleForComponent('default-clock', 'Integration | Component | default clock', {
   integration: true
 });
 
-test('show the correct time and register  #int-default-clock-test-01', 
+test('show the correct time #int-default-clock-test-01', 
   async function(assert) {
-
-  assert.expect(2);
-
-  this.set('register', (clock) => {
-    assert.ok(clock, 'registers the clock!');
-  });
 
   this.set('time', {
     pomodoro: '25:00',
@@ -27,7 +21,6 @@ test('show the correct time and register  #int-default-clock-test-01',
 
   await this.render(hbs`{{default-clock 
                     time=time
-                    registerFunc=register
                   }}`);
   let result = helper
       .removeSpace(document
@@ -35,70 +28,34 @@ test('show the correct time and register  #int-default-clock-test-01',
   assert.equal(result, "01:0001:0025:00");
 });
 
-test('start, pause, resume and reset the clock #int-default-clock-test-02', 
+test('show right button depending on the state clock #int-default-clock-test-02', 
   async function(assert){
 
-  assert.expect(4);
-
   let $startButton = '[data-test-start-button]',
-      $resetButton = '[data-test-reset-button]',
       $pauseButton = '[data-test-pause-button]',
-      $resumeButton = '[data-test-resume-button]';
+      $resumeButton = '[data-test-resume-button]',
+      $resetButton = '[data-test-reset-button]';
 
-  this.set('time', {
-    pomodoro: '25:00',
-    day: '01:00:00',
-    week: '01:00:00'
-  });
+  this.set('state', 'stopped'); 
 
-  // the start function doesn't start the clock right away
-  let compClock;
-  this.set('startFunc', (clock) => {
-    compClock = clock;
-    clock.start();
-  });
-
-  this.render(hbs`{{default-clock 
-                    time=time
-                    startFunc=startFunc
+  await this.render(hbs`{{default-clock 
+                    state=state
                   }}`);
 
-  let $clockFace = document.querySelector('.clock-face');
+  assert.ok(document.querySelector($startButton), 
+    'show start button');
 
-  await click($startButton);
+  this.set('state', 'paused');
 
-  return new rsvp.Promise((resolve) => {
-    setTimeout(async () => {
-      let result = helper
-        .removeSpace($clockFace.textContent);
-      assert.equal(result, "01:0001:0024:59");
+  assert.ok(document.querySelector($resumeButton), 
+    'show resume button.');
 
-      await click($pauseButton);
+  assert.ok(document.querySelector($resetButton), 
+    'show reset button.');
 
-      setTimeout(async () => {
-        result = helper
-          .removeSpace($clockFace.textContent);
-        assert.equal(result, "01:0001:0024:59")
+  this.set('state', 'started');
 
-        await click($resumeButton);
+  assert.ok(document.querySelector($pauseButton), 
+    'show pause button.');
 
-        setTimeout(async () => {
-          result = helper
-            .removeSpace($clockFace.textContent);
-          assert.equal(result, "01:0001:0024:58");
-
-          await click($resetButton);
-
-          setTimeout(async () => {
-            result = helper
-              .removeSpace($clockFace.textContent);
-            assert.equal(result, "01:0001:0025:00");
-            resolve();
-          });
-        }, 1000);
-      }, 1000);
-    }, 1000)
-  });
 });
-
-

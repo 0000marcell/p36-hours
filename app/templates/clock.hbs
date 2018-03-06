@@ -1,3 +1,4 @@
+{{title selectedTask.name}}
 <div class="flex-row inline-center">
   <div class="app-body">
     <div class="flex-row inline-center default-padding">
@@ -6,9 +7,12 @@
     <div class="default-padding">
       {{default-clock 
         time=time 
+        state=clock.state
         startFunc=(action "start")
+        pauseFunc=(action "pause")
+        resetFunc=(action "reset")
+        resumeFunc=(action "resume")
         finishFunc=(action "timerFinished")
-        registerFunc=(action "register")
         }}
     </div>
     <div class="default-padding">

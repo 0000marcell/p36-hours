@@ -1,5 +1,6 @@
 import Controller from '@ember/controller';
 import { get, set, setProperties } from '@ember/object';
+import { alias } from '@ember/object/computed';
 import mock from 'p36-hours/p36-hours/mock';
 import { inject } from '@ember/service';
 
@@ -19,6 +20,8 @@ function download(filename, text) {
 
 export default Controller.extend({
   store: inject('store'),
+  clock: inject('clock-service'),
+  time: alias('clock.time'),
   modalService: inject('modal-dialog'),
   init(){
     this._super(...arguments);
@@ -54,7 +57,6 @@ export default Controller.extend({
               read.onloadend = async () => {
                 let json = JSON.parse(read.result);
                 await mock.deleteAll(store);
-                console.log('json: ', json);
                 await mock.constructDbFromObj(store, json);
                 window.location.reload();
               }
