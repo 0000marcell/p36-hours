@@ -114,39 +114,42 @@ export default {
             savedTags = [],
             tagObjects = [],
             savedChildren = [];
+        if(task['pomodoros']){
+          task.pomodoros.forEach((pomodoro) => {
+            savedPomodoros.push(
+              store.createRecord('pomodoro', {
+                date: new Date(pomodoro.date),
+                task: newTask
+              }).save()
+            );
+          });
+        } 
         
-        task.pomodoros.forEach((pomodoro) => {
-          savedPomodoros.push(
-            store.createRecord('pomodoro', {
-              date: new Date(pomodoro.date),
-              task: newTask
-            }).save()
-          );
-        });
-
-        task.tags.forEach((tagName) => {
-          if(savedTagsNames.indexOf(tagName) === -1){
-            savedTags.push(
-              store.createRecord('tag', {
-                name: tagName
-              }).save().then((tag) => {
-                tagObjects.push(tag);
-              }) 
-            );
-            savedTagsNames.push(tagName);
-          }else{
-            savedTags.push(
-              new rsvp.Promise((resolve) => {
-                store.findAll('tag').then((tags) => {
-                  tagObjects
-                    .push(tags.findBy('name', tagName))
-                  resolve();
-                });
-              })
-            );
-          }
-        });
-
+        if(task['tags']){
+          task.tags.forEach((tagName) => {
+            if(savedTagsNames.indexOf(tagName) === -1){
+              savedTags.push(
+                store.createRecord('tag', {
+                  name: tagName
+                }).save().then((tag) => {
+                  tagObjects.push(tag);
+                }) 
+              );
+              savedTagsNames.push(tagName);
+            }else{
+              savedTags.push(
+                new rsvp.Promise((resolve) => {
+                  store.findAll('tag').then((tags) => {
+                    tagObjects
+                      .push(tags.findBy('name', tagName))
+                    resolve();
+                  });
+                })
+              );
+            }
+          });
+        }
+        
         return rsvp.all(savedPomodoros).then(() => {
           return rsvp.all(savedTags).then(() => {
             if(task['children']){
@@ -157,12 +160,18 @@ export default {
               });
             }
             return rsvp.all(savedChildren).then((children) => {
-              children.forEach((child) => {
-                newTask.get('children').pushObject(child);
-              });
-              tagObjects.forEach((tag) => {
-                newTask.get('tags').pushObject(tag);
-              });
+              if(children){
+                children.forEach((child) => {
+                  newTask.get('children').pushObject(child);
+                });
+              }
+              
+              if(tagObjects){
+                tagObjects.forEach((tag) => {
+                  newTask.get('tags').pushObject(tag);
+                });
+              }
+              
               newTask.save().then((task) => {
                 resolve(task);
               });
@@ -190,8 +199,8 @@ export default {
   grabOldInfo(store){
     return new rsvp.Promise((resolve) => {
       this.deleteAll(store).then(() => {
-        let id = 'AKIAJDACZGEP7FBSSHGA',
-            key = 'LdeWj0jY4//Zhd+nLKpUBvimJo1svIqtdjMJQ6ps',
+        let id = 'ENV',
+            key = 'ENV',
             region = 'sa-east-1';
         AWS.config.update({accessKeyId: id,
           secretAccessKey: key,
