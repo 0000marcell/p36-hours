@@ -3,6 +3,7 @@ import { get, set, setProperties } from '@ember/object';
 import { alias } from '@ember/object/computed';
 import mock from 'p36-hours/p36-hours/mock';
 import { inject } from '@ember/service';
+import tourSteps from 'p36-hours/p36-hours/tour-steps';
 
 function download(filename, text) {
   var element = document.createElement('a');
@@ -21,6 +22,7 @@ function download(filename, text) {
 export default Controller.extend({
   store: inject('store'),
   clock: inject('clock-service'),
+  tour: inject('tour'),
   time: alias('clock.time'),
   modalService: inject('modal-dialog'),
   init(){
@@ -38,6 +40,15 @@ export default Controller.extend({
     }
     set(this, 'modal', modal);
     modalService.set('modal', modal);
+
+    this.get('tour').setProperties({
+      steps: tourSteps,
+      autoStart: false,
+      modal: true,   
+      defaults: {
+        classes: 'shepherd shepherd-step shepherd-element shepherd-open shepherd-theme-arrows'
+      }
+    });
   },
   actions: {
     didSelectFiles(files){
@@ -83,6 +94,9 @@ export default Controller.extend({
         showDialog: false,
         hideButtons: false 
       });
+    },
+    showHelp(){
+      this.get('tour').show('upload');
     }
   }
 });

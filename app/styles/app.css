@@ -96,7 +96,9 @@ h3{
 }
 
 .backup {
-  padding-bottom: 40px;
+  padding: 20px 0 40px 0;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .backup button{
@@ -134,12 +136,8 @@ textarea:focus {
   outline-width: 0;
 }
 
-::-webkit-input-placeholder { /* WebKit browsers */
-  //padding: 10px;
+.shepherd-content{
+  max-width: 300px;
 }
-:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-}
-::-moz-placeholder { /* Mozilla Firefox 19+ */
-}
-:-ms-input-placeholder { /* Internet Explorer 10+ */
-}
+
+button:focus { outline:0; }

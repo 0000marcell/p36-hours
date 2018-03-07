@@ -1,7 +1,7 @@
 import PouchDB from 'pouchdb';
 import { Adapter } from 'ember-pouch';
 
-let db = new PouchDB('p36-hours4');
+let db = new PouchDB('p36-hours2');
 
 //db.destroy();
 
