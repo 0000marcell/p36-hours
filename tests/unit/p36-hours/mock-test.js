@@ -10,6 +10,8 @@ moduleFor('mock',
     integration: true,
     beforeEach(){
       this.store = this.container.lookup('service:store');
+      this.adapter = this.container.lookup('adapter:application');
+      debugger;
       helper.setStore(this.store);
     }
 });

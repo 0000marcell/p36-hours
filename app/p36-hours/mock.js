@@ -199,8 +199,8 @@ export default {
   grabOldInfo(store){
     return new rsvp.Promise((resolve) => {
       this.deleteAll(store).then(() => {
-        let id = 'ENV',
-            key = 'ENV',
+        let id = process.env.AWS_ACCESS_KEY_ID,
+            key = process.env.AWS_SECRET_ACCESS_KEY,
             region = 'sa-east-1';
         AWS.config.update({accessKeyId: id,
           secretAccessKey: key,
