@@ -53,13 +53,14 @@ textarea{
 }
 
 .ember-power-select-trigger{
-  width: 370px;
+  width: 380px;
   min-height: 43px;
   border: 3px solid #222 !important;
   border-radius: 0;
   letter-spacing: 3px;
   font-size: 24px;
   overflow: hidden;
+  margin: 10px 0 10px 0; 
 }
 
 .ember-power-select-trigger:focus {

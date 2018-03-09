@@ -1,6 +1,10 @@
 <ul>
   {{#each data as |item|}}
-    {{tree-view-item data=item select=(action 'select') add=add}}
+    {{#if (or showAll (eq item.status "active"))}}
+      {{tree-view-item 
+        showAll=showAll
+        data=item select=(action 'select') add=add}}
+    {{/if}}
   {{/each}}
 </ul>
 

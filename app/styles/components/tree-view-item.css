@@ -10,6 +10,11 @@
   border-left: 3px solid #333;
 }
 
+.tree-view-item .status{
+  background-color: #90A4AE;
+  border-left: 3px solid #263238;
+}
+
 .tree-view-item .item-name{
 }
 

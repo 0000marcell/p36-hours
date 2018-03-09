@@ -1,12 +1,12 @@
 import rsvp from 'rsvp';
+import { get } from '@ember/object';
 
 export default {
-  rootTasks(tasks, status){
+  rootTasks(tasks){
     return new rsvp.Promise((resolve) => {
       resolve(
         tasks.filter((task) => {
-          return (!task.get('parent') && 
-            task.get('status') === status)
+          return !task.get('parent')
         })
       );
     });
@@ -30,5 +30,20 @@ export default {
       pomDate.setHours(0, 0, 0, 0);
       return pomDate.getTime() === date.getTime();
     });
+  },
+  searchTaskTree(task, term){
+    let results = [],
+        regexp = new RegExp(term, 'i');
+    if(get(task, 'name').match(regexp)){
+      results.push(task);
+    }
+    let children = get(task, 'children');
+    if(children.get('length')){
+      children.forEach((child) => {
+        results = 
+          results.concat(...this.searchTaskTree(child, term));
+      });
+    }
+    return results;
   }
 }

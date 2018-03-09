@@ -19,7 +19,11 @@
   <ul>
     {{#if showChildren}}
       {{#each data.children as |child|}} 
-        {{tree-view-item data=child select=select add=add}}
+        {{#if (or showAll (eq child.status "active"))}}
+          {{tree-view-item 
+            showAll=showAll
+            data=child select=select add=add}}
+        {{/if}}
       {{/each}}
     {{/if}}
   </ul>

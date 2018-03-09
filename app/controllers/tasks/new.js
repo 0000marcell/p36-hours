@@ -10,7 +10,6 @@ export default Controller.extend({
     parent.get('children').pushObject(model);
     parent.save().then(() => {
       model.save().then(() => {
-        console.log('task created!');
         this.transitionToRoute('clock');
       }).catch((err) => {
         console.log('problem trying to save the child', err);

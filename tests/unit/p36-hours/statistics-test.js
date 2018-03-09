@@ -1,7 +1,6 @@
 import { run } from '@ember/runloop';
 import { moduleFor, test } from 'ember-qunit';
 import statistics from 'p36-hours/p36-hours/statistics';
-import rsvp from 'rsvp';
 import mock from 'p36-hours/p36-hours/mock';
 
 
@@ -12,7 +11,7 @@ function lastThreeMonthsDates(){
       newDate = threeMonthsAgo,
       dates = [];
   while(newDate < today){
-    dates.push(newDate);
+    dates.push(new Date(newDate));
     newDate.setDate(newDate.getDate() + 1);
   }
   return dates;
@@ -49,44 +48,44 @@ moduleFor('statistics',
     integration: true,
     async beforeEach(){
       this.store = this.container.lookup('service:store');
-      let saving = [];
-      dates.forEach(async (date) => {
-        saving.push(
-          this.store.createRecord('pomodoro', {
+      for(let date of dates){
+        await run(async () => {
+          await this.store.createRecord('pomodoro', {
             date: date
           }).save()
-        )
-      });
-      await rsvp.all(saving);
+        });
+      }
     },
     async afterEach(){
+      /*
       await run(async () => {
         await mock.deleteAll(this.store);
       });
+      */
     }
 });
 
-test('construct line chart object data #unit-statistics-test-01', 
+test('construct line chart object data #unit-statistics-01', 
   async function(assert){
-    await this.store.findAll('pomodoro').then((pomodoros) => {
-      let twoWeeksAgo = new Date();
-      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-      let results = statistics.lineChart(pomodoros, 
-        twoWeeksAgo, new Date());
-      assert.equal(Object.keys(results).length, 14);
-      assert.equal(results[0].value, 2);
-    });
+    let pomodoros = await this.store.findAll('pomodoro');
+    let twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 13);
+    let results = statistics.lineChart(pomodoros, 
+      twoWeeksAgo, new Date());
+    assert.equal(Object.keys(results).length, 14, 
+      'return 14 days of the last two weeks');
+    assert.equal(results[0].value, 1, 
+      '1 for each day');
 });
 
-test('construct week comparison #unit-statistics-test-02', 
+test('construct week comparison #unit-statistics-02', 
   async function(assert){
-    await this.store.findAll('pomodoro').then((pomodoros) => {
-      let result = statistics.lastWeekComparison(pomodoros);
-      assert.equal(result, 0);
-    });
+    let pomodoros = await this.store.findAll('pomodoro');
+    let result = statistics.lastWeekComparison(pomodoros);
+    assert.equal(result, 0);
   });
 
-test('construct month comparison #unit-statistics-test-03', 
+test('construct month comparison #unit-statistics-03', 
   async function(assert){
     await this.store.findAll('pomodoro').then((pomodoros) => {
       let result = statistics.lastMonthComparison(pomodoros);
@@ -94,7 +93,7 @@ test('construct month comparison #unit-statistics-test-03',
     });
   });
 
-test('format text from the comparison #unit-statistics-test-04', 
+test('format text from the comparison #unit-statistics-04', 
   function(assert){
   assert.equal(statistics.formatComparison(0), 
     'about the same time');
@@ -108,7 +107,7 @@ test('format text from the comparison #unit-statistics-test-04',
   assert.equal(statistics.formatComparison(-4), '2 hours less');
 });
 
-test('build calendar chart data #unit-statistics-test-05', 
+test('build calendar chart data #unit-statistics-05', 
   function(assert){
   let pomodoros = [
     {date: new Date(2013, 1, 2).toString()},
@@ -125,42 +124,11 @@ test('build calendar chart data #unit-statistics-test-05',
   assert.deepEqual(result, expected);
 });
 
-test('build radar chart data #unit-statistics-test-06', 
+test('build radar chart data #unit-statistics-06', 
   async function(assert){
-
-  let pomodoros = new rsvp.Promise((resolve) => {
-    let results = dates.map((date) => ({ date: date }));
-    resolve(results);
-  });
-
-  let threeTasks = [],
-      twoTasks = [],
-      nestedTasks = [];
-  for (var i = 0; i < 3; i++) {
-    threeTasks.push(
-      {
-        id: i,
-        name: `task ${i}`,
-        pomodoros: pomodoros
-      }
-    );
-
-    if(i < 2){
-      twoTasks.push(
-        {
-          id: i,
-          name: `task ${i}`,
-          pomodoros: pomodoros
-        }
-      );
-    }
-  }
-
-  nestedTasks = [
-    {id: 5, name: 'task 3'},
-    {id: 6, name: 'task 4'}
-  ];
-  nestedTasks[0]['children'] = threeTasks;
+  
+  let tasks = await mock.constructDbFromObj(this.store, fakeData),
+      task = task.objectAt(0);
 
   let expected = [
     [ 
@@ -169,12 +137,14 @@ test('build radar chart data #unit-statistics-test-06',
       {axis:'task 2', value: 0.33},
     ]
   ];
-  assert.deepEqual(await statistics.radarChart(threeTasks), 
+
+  assert.deepEqual(await statistics.radarChart(task), 
       expected, 'load data for three tasks!');
   assert.deepEqual(await statistics.radarChart(twoTasks), 
     [], 'return a empty array if the data is not valid');
   assert.deepEqual(await statistics.radarChart(threeTasks), 
     expected, 'load data for nestedTasks!');
+
 });
 
 let tagsObj = [
@@ -203,7 +173,7 @@ async function createTagsData(store){
   return tags;
 }
 
-test('radar chart from tags #unit-statistics-test-07', 
+test('radar chart from tags #unit-statistics-07', 
   async function(assert){
     let expected = [
       [

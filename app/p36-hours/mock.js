@@ -159,11 +159,19 @@ export default {
                 );
               });
             }
-            return rsvp.all(savedChildren).then((children) => {
+            return rsvp.all(savedChildren).then(
+              async (children) => {
               if(children){
-                children.forEach((child) => {
+                for(let child of children){
                   newTask.get('children').pushObject(child);
-                });
+                  child.set('parent', newTask);
+                  await run(async () => {
+                    await newTask.save();
+                  });
+                  await run(async () => {
+                    await child.save();
+                  });
+                }
               }
               
               if(tagObjects){

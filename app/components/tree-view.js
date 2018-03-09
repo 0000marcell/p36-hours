@@ -1,6 +1,13 @@
 import Component from '@ember/component';
 import { set, get } from '@ember/object'; 
 
+/**
+ * @component tree-view
+ * @param {Boolean} showAll
+ * @param {Object} data 
+ * @param {Function} select
+ * @param {Function} add 
+ */
 export default Component.extend({
   classNames: ['tree-view'],
   loadChildren(item, proms){

@@ -8,6 +8,7 @@ export default Controller.extend({
   time: alias('clock.time'),
   modalService: inject('modal-dialog'),
   clock: inject('clock-service'),
+  showAll: false,
   async init(){
     this._super(...arguments);
     let modal = get(this, 'modalService.modal');
@@ -19,8 +20,8 @@ export default Controller.extend({
     });
   },
   stateHelper: inject('state-helper'),
-  tabOptions: [{value: 'active', text: 'active', selected: true}, 
-            {value: 'archived', text: 'archived', selected: false}
+  tabOptions: [{value: false, text: 'active', selected: true}, 
+            {value: true, text: 'show all', selected: false}
   ],
   grabName(item, path){
     if(item.get('parent.id'))
@@ -82,10 +83,7 @@ export default Controller.extend({
       }
     },
     taskStatus(option){
-      filter.rootTasks(get(this, 'model.tasks'), 
-        option.value).then((tasks) => {
-        set(this, 'filteredTasks', tasks);
-      });
+      set(this, 'showAll', option.value);
     },
     add(item){
       get(this, 'stateHelper').set('parentTask', item);
@@ -116,6 +114,22 @@ export default Controller.extend({
         set(clock, 'time', time);
       }
       clock.start();
+    },
+    
+    search(term){
+      let tabTasks = get(this, '_tabTasks');
+      if(term){
+        let results = [];
+        tabTasks.forEach((task) => {
+          results = 
+            results.concat(...filter.searchTaskTree(task, term));
+        });
+        if(results.get('length'))
+          set(this, 'filteredTasks', results);
+      }else{
+        set(this, 'filteredTasks', 
+          get(this, '_tabTasks'));
+      }
     }
   }
 });

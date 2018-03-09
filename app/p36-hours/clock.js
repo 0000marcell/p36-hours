@@ -1,6 +1,7 @@
 import { run } from '@ember/runloop';
-import helpers from 'p36-hours/p36-hours/helpers';
+import dateHelper from 'p36-hours/p36-hours/date-helper';
 import { set, get } from '@ember/object';
+
 
 const HOUR = 3600,
       MIN = 60;
@@ -93,7 +94,7 @@ export default {
 
     let dayCountDate = new Date(get(dayCount, 'date')),
         today = new Date();
-    if(!helpers.compareDates(dayCountDate, today)){
+    if(!dateHelper.compareDates(dayCountDate, today)){
       await run(async () => {
         set(dayCount, 'date', new Date());
         set(dayCount, 'time', 0);
@@ -120,10 +121,10 @@ export default {
       
     let weekCountDate = new Date(weekCount.get('date')),
         today = new Date(),
-        weekCountSunday = helpers.currSunday(weekCountDate),
-        thisWeekSunday = helpers.currSunday(today);
+        weekCountSunday = dateHelper.currSunday(weekCountDate),
+        thisWeekSunday = dateHelper.currSunday(today);
 
-    if(!helpers.compareDates(weekCountSunday, thisWeekSunday)){
+    if(!dateHelper.compareDates(weekCountSunday, thisWeekSunday)){
       await run(async () => {
         set(weekCount, 'date', new Date());
         set(weekCount, 'time', 0);

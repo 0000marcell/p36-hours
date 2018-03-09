@@ -23,6 +23,14 @@
     <a {{action "removeTag" item bubbles=false}}>x</a>
   </div>
 {{/power-select-multiple}}
+{{#if isEdit}}
+  {{#power-select 
+    selected=selectedStatus
+    options=status onchange=(action "selectStatus") 
+    as |status|}}
+    {{status}}
+  {{/power-select}}
+{{/if}}
 {{#default-button onClick=(action "submit")}}
   {{if isEdit 'edit' 'add'}}
 {{/default-button}}

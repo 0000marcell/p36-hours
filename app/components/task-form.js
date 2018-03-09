@@ -5,6 +5,10 @@ import { inject } from '@ember/service';
 export default Component.extend({
   store: inject('store'),
   classNames: ['task-form'],
+  selectedStatus: computed(function() {
+    return get(this, 'model.status');
+  }),
+  status: ['active', 'archived'],
   selectedTags: computed(async function(){
     return await get(this, 'model.tags').toArray();
   }),
@@ -14,6 +18,9 @@ export default Component.extend({
   actions: {
     selectTag(selection){
       set(this, 'selectedTags', selection);
+    },
+    selectStatus(selection){
+      set(this, 'selectedStatus', selection);
     },
     async handleKeydown(dropdown, e) {
       let text = e.target.value;
@@ -37,11 +44,11 @@ export default Component.extend({
     },
     async submit(){
       let selectedTags = await get(this, 'selectedTags'),
+          status = get(this, 'selectedStatus'),
           model = get(this, 'model');
+      model.set('status', status);
       if(selectedTags.length){
         for(let tag of selectedTags){
-          //tag.get('tasks').pushObject(model);
-          //tag = await tag.save()
           model.get('tags').pushObject(tag);
         }
       }

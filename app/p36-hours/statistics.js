@@ -1,6 +1,6 @@
 import filters from './filters';
 import { timeFormat } from 'd3-time-format';
-import helpers from './helpers';
+import dateHelper from './date-helper';
 import { get } from '@ember/object';
 import rsvp from 'rsvp';
 
@@ -42,7 +42,7 @@ export default {
   },
   lastWeekComparison(pomodoros){
     let today = new Date(),
-        currMonday = helpers.currMonday(new Date()),
+        currMonday = dateHelper.currMonday(new Date()),
         lastMonday = new Date(),
         thisDayLastWeek = new Date();
     lastMonday.setDate(currMonday.getDate() - 7);

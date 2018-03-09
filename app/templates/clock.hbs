@@ -19,10 +19,12 @@
       {{default-tabs options=tabOptions select=(action "taskStatus")}}
     </div>
     <div class="search-bar default-padding">
-      {{input value=searchTerm placeholder="search"}}
+      {{search-input search=(action "search")}}
     </div>
     <div class="default-padding">
-      {{tree-view data=filteredTasks select=(action "select")
+      {{tree-view 
+        showAll=showAll
+        data=filteredTasks select=(action "select")
         add=(action "add")}}
     </div>
     {{outlet}}

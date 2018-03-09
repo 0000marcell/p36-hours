@@ -1,6 +1,5 @@
 import { run } from '@ember/runloop';
 import { moduleFor, test } from 'ember-qunit';
-import { get } from '@ember/object';
 import mock from 'p36-hours/p36-hours/mock';
 import rsvp from 'rsvp';
 import helper from '../../helpers/store';
@@ -11,7 +10,6 @@ moduleFor('mock',
     beforeEach(){
       this.store = this.container.lookup('service:store');
       this.adapter = this.container.lookup('adapter:application');
-      debugger;
       helper.setStore(this.store);
     }
 });
@@ -53,17 +51,22 @@ const obj = {
 
 test('create one task in the store based on a object #unit-mock-01', async function(assert) {
   await run(async () => {
-    let taskObj = obj.tasks[0],
-        task = await mock.createTask(this.store, taskObj, []);
+    let taskObj = obj.tasks[0];
+    
+    let task = await mock.createTask(this.store, taskObj, []);
+    
     assert.equal(task.get('name'), 
       'task 1', 'created task have a name');
 
     let storedTask = await this.store.find('task', task.get('id'));
     assert.equal(storedTask.get('name'), task.get('name'), 
       'crated task have the same name')
-    let taskChild = await storedTask.get('children');
-    assert.equal(taskChild.objectAt(0).get('name'), 'task 3', 
+    let taskChild = storedTask.get('children').objectAt(0);
+    assert.equal(taskChild.get('name'), 'task 3', 
       'task child has the right name');
+
+    assert.equal(taskChild.get('parent.name'), 'task 1', 
+      'save parent on the child');
 
     let tags = await storedTask.get('tags');
     assert.equal(tags.get('length'), 2, 'task has 2 tags');
