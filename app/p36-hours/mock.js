@@ -1,24 +1,64 @@
 import rsvp from 'rsvp';
 import { run } from '@ember/runloop';
+import { get, set } from '@ember/object';
 
 export default {
-  /*
-  deleteTask(task){
-    return new rsvp.Promise((resolve) => {
-      let deletedPomodoros = [];
-      task.get('pomodoros').then((pomodoros) => {
-        pomodoros.map((pomodoro) => {
-          deletedPomodoros.push(pomodoro.destroyRecord());
+  async deleteTask(task, delIds = []){
+    let children = get(task, 'children');
+    if(get(children, 'length')){
+      for(let child of children.toArray()){
+        delIds = delIds.concat(...await this.deleteTask(child));
+      }
+    }
+    
+    let pomodoros = await get(task, 'pomodoros');
+    if(get(pomodoros, 'length')){
+      for(let pomodoro of pomodoros.toArray()){
+        await run(async () => {
+          await pomodoro.destroyRecord();
         });
-      });
-      rsvp.all(deletedPomodoros).then(() => {
-        task.destroyRecord().then(() => {
-          resolve();
+      }
+    }
+
+    let tags = await get(task, 'tags');
+    if(get(tags, 'length')){
+      for(let tag of tags.toArray()){
+        let tasks = await get(tag, 'tasks'),
+            results = tasks.filter((tagTask) => {
+              return get(tagTask, 'id') !== get(task, 'id');
+            });
+        await run(async () => {
+          await set(tag, 'tasks', results);
         });
-      });
+      }
+    }
+    
+    await run(async () => {
+      await set(task, 'tags', []);
+      set(task, 'parent', null) 
     });
+
+    await run(async () => {
+      delIds.push(task.get('id'));
+      await task.destroyRecord();  
+    });
+    return delIds;
   },
-  */
+  async deleteAll(store){
+    let tasks = await store.findAll('task'),
+        delIds = [];
+    for(let task of tasks.toArray())
+      if(!delIds.find((id) => ( id === task.get('id'))))
+        delIds = delIds.concat(...await this.deleteTask(task));
+    
+    let tags = await store.findAll('tag');
+
+    for(let tag of tags.toArray()){
+      await run(async () => {
+        tag.destroyRecord();
+      });
+    }
+  },
   async deleteAll2(store, models){
     for(let model of models){
       let records = await store.findAll(model);
@@ -29,7 +69,7 @@ export default {
       }
     }
   },
-  deleteAll(store){
+  deleteAll3(store){
     return new rsvp.Promise((resolve) => {
       let deleting = [];
       deleting.push(
@@ -104,7 +144,57 @@ export default {
       });
     });
   },
-  createTask(store, task, savedTagsNames){
+  async createTask(store, task, parent = null){
+    let newTask;
+    await run(async () => {
+      newTask = await store.createRecord('task', {
+        name: task.name,
+        status: 'active',
+        parent: parent
+      }).save();
+    });
+    
+    if(task['pomodoros']){
+      for(let pomodoro of task['pomodoros']){
+        await run(async () => {
+          await store.createRecord('pomodoro', {
+            date: new Date(pomodoro.date),
+            task: newTask
+          }).save();
+        });
+      }
+    }
+
+    if(task['tags']){
+      let tags = await store.findAll('tag'),
+          tagsToInclude = [];
+      for(let tag of task['tags']){
+        let newTag = tags.findBy('name', tag);
+        if(!newTag){
+          await run(async () => {
+            newTag = await store.createRecord('tag', {
+              name: tag
+            }).save();
+          });
+        }
+        newTag.get('tasks').pushObject(newTask);
+        tagsToInclude.push(newTag);
+      }
+      set(newTask, 'tags', tagsToInclude);
+    }
+
+    if(task['children']){
+      let children = [];
+      for(let child of task['children']){
+        children.push(
+          await this.createTask(store, child, newTask)
+        );
+      }
+      set(newTask, 'children', children);
+    }
+    return newTask;
+  },
+  createTask2(store, task, savedTagsNames){
     return new rsvp.Promise((resolve) => {
       return store.createRecord('task', {
         name: task.name,
@@ -155,7 +245,7 @@ export default {
             if(task['children']){
               task.children.forEach((child) => {
                 savedChildren.push(
-                  this.createTask(store, child, savedTagsNames)
+                  this.createTask2(store, child, savedTagsNames)
                 );
               });
             }
@@ -191,11 +281,10 @@ export default {
   },
   constructDbFromObj(store, obj){
     return new rsvp.Promise((resolve) => {
-      let promises = [],
-          savedTagsNames = [];
+      let promises = [];
       obj.tasks.forEach((task) => {
         promises.push(
-          this.createTask(store, task, savedTagsNames)
+          this.createTask(store, task)
         );
       });
       return rsvp.all(promises).then((tasks) => {

@@ -1,8 +1,9 @@
 import { run } from '@ember/runloop';
 import { moduleFor, test } from 'ember-qunit';
 import filters from 'p36-hours/p36-hours/filters';
+import dateHelper from 'p36-hours/p36-hours/date-helper';
+import helper from '../../helpers/store';
 import mock from 'p36-hours/p36-hours/mock';
-import { all } from 'rsvp';
 import { get } from '@ember/object';
 
 
@@ -12,44 +13,54 @@ moduleFor('filters',
   integration: true,
   async beforeEach(){
     this.store = this.container.lookup('service:store');
-    let saving = [];
-    dates.forEach(async (date) => {
-      saving.push(
-        this.store.createRecord('pomodoro', {
-          date: date
-        }).save()
-      )
-    });
-    await all(saving);
+    //this.adapter = this.container.lookup('adapter:application');
+    helper.setStore(this.store);
   }
 });
 
 test('grab all pomodoros in a date range #unit-filters-01', 
   async function(assert){
-    let pomodoros = await this.store.findAll('pomodoro'),
-        twoWeeksAgo = new Date();
+
+    let dates = dateHelper.lastXDays(14);
+    for(let date of dates){
+      await helper.createModel('pomodoro', {
+        date: date
+      });
+    }
+
+    let twoWeeksAgo = new Date(),
+        today = new Date();
 
     twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    today.setHours(0, 0, 0, 0);
+    twoWeeksAgo.setHours(0, 0, 0, 0);
 
-    let results = 
-      filters.pomodorosInRange(pomodoros, twoWeeksAgo, new Date());
-    assert.equal(results.length, 14);
+    let pomodoros = await this.store.findAll('pomodoro');
+
+    let results = filters
+      .pomodorosInRange(pomodoros, twoWeeksAgo, today);
+    assert.equal(results.length, 14, 'has 14 dates');
+    assert.deepEqual(results[0].get('date'), twoWeeksAgo, 
+      'first date is two weeks ago');
 });
 
 test('grab all pomodoros with a specific date #unit-filters-02', 
   async function(assert){
+
+    let pomodoro = await helper.createModel('pomodoro', {
+      date: new Date() 
+    });
+
     let pomodoros = await this.store.findAll('pomodoro'),
         date = new Date();
 
-    date.setDate(date.getDate() - 1);
-
     let results = filters.pomodorosHaveDate(pomodoros, date);
-
     assert.equal(results.length, 1);
     date.setHours(0, 0, 0, 0);
     let pomDate = new Date(results[0].get('date'));
     pomDate.setHours(0, 0, 0, 0);
     assert.deepEqual(pomDate, date);
+    await helper.deleteModel(pomodoro);
 });
 
 test('searchTaskTree  #unit-filters-03', 

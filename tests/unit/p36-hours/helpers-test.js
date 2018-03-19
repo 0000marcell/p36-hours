@@ -2,7 +2,7 @@ import { test } from 'ember-qunit';
 import helpers from 'p36-hours/p36-hours/helpers';
 
 test(`return string of the 
-  full path of the task #unit-helpers-test-01`, 
+  full path of the task #unit-helpers-01`, 
   function(assert){
   let withParents = {
     id: 3,

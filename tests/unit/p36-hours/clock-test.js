@@ -1,5 +1,6 @@
 import { moduleFor, test } from 'ember-qunit';
 import clock from 'p36-hours/p36-hours/clock';
+import dateHelper from 'p36-hours/p36-hours/date-helper';
 import helper from '../../helpers/store';
 import rsvp from  'rsvp';
 
@@ -12,21 +13,21 @@ moduleFor('clock',
     }
 });
 
-test('converts string time to sec #unit-clock-test-01', 
+test('converts string time to sec #unit-clock-mod-01', 
   function(assert) {
   let min = clock.convertToSec('25:00', 'min'),
-      hour = clock.convertToSec('01:00', 'hour');
-  assert.equal(min, 1500);
-  assert.equal(hour, 3600);
+      hour = clock.convertToSec('01:00:00', 'hour');
+  assert.equal(min, 1500, 'convert type min');
+  assert.equal(hour, 3600, 'convert type hour');
 });
 
-test('converts sec time in to string min #unit-clock-test-02', 
+test('converts sec time in to string min #unit-clock-mod-02', 
   function(assert) {
   let result = clock.convertToMin(1480);
   assert.equal(result, '24:40');
 });
 
-test('converts sec time in to string hour #unit-clock-test-03', 
+test('converts sec time in to string hour #unit-clock-mod-03', 
   function(assert) {
   assert.equal(clock.convertToHour(3661), '01:01:01');
   assert.equal(clock.convertToHour(3543), '00:59:03');
@@ -34,92 +35,49 @@ test('converts sec time in to string hour #unit-clock-test-03',
   assert.equal(clock.convertToHour(360002), '100:00:02');
 });
 
-test('getDayHCount  value non zero #unit-clock-test-04', 
+test('getDayHCount  value non zero #unit-clock-mod-04', 
   async function(assert){
-    let time = await helper.createModel('time', {
-      name: 'day',
-      date: new Date(),
-      time: 600
+    for (var i = 0; i < 3; i++) {
+      await helper.createModel('pomodoro', {
+        date: new Date(),
+      });  
+    }
+    let result = await clock.getDayHCount(this.store);
+    assert.equal(result, '01:15:00');
+});
+
+test('getDayHCount  value is zero #unit-clock-mod-05', 
+  async function(assert){
+    let result = await clock.getDayHCount(this.store);
+    assert.equal(result, '00:00:00');
+});
+
+test('getWeekHCount #unit-clock-mod-06', 
+  async function(assert){
+
+  let currMonday = dateHelper.currMonday(new Date),
+      currSunday = dateHelper.currSunday(new Date),
+      weekDates = dateHelper.datesRange(currMonday, currSunday);
+
+  for(let day of weekDates){
+    await helper.createModel('pomodoro', {
+      date: day
     });
+  }
 
-    let result = await clock.getDayHCount(this.store);
-    assert.equal(result, '00:10');
-    await helper.deleteModel(time);
+  assert.equal(await clock.getWeekHCount(this.store), '02:55:00');
 });
 
-test('getDayHCount  value is zero #unit-clock-test-05', 
-  async function(assert){
-    let time = await helper.createModel('time', {
-      name: 'day',
-      date: new Date(),
-      time: 0
-    });
-
-    let result = await clock.getDayHCount(this.store);
-    assert.equal(result, '00:00');
-    await helper.deleteModel(time);
-});
-
-test('getDayHCount  date has passed #unit-clock-test-06', 
-  async function(assert){
-    let time = await helper.createModel('time', {
-      name: 'day',
-      date: new Date(2015, 1, 1),
-      time: 6000
-    });
-    
-    let result = await clock.getDayHCount(this.store);
-
-    assert.equal(result, '00:00');
-    
-    await helper.deleteModel(time);
-});
-
-test('getDayHCount  no day count yet #unit-clock-test-07', 
-  async function(assert){
-    let result = await clock.getDayHCount(this.store);
-    assert.equal(result, '00:00');
-    let times = await this.store.findAll('time');
-    for(let time of times.toArray())
-      await helper.deleteModel(time);
-});
-
-test('getWeekHCount #unit-clock-test-08', 
-  async function(assert){
-
-  let time = await helper.createModel('time', {
-    name: 'week',
-    date: new Date(),
-    time: 3600
-  });
-
-  assert.equal(await clock.getWeekHCount(this.store), '01:00');
-  await helper.deleteModel(time);
-
-});
-
-test('getWeekHCount week has passed #unit-clock-test-09', 
-  async function(assert){
-
-  let time = await helper.createModel('time', {
-    name: 'week',
-    date: new Date(2015, 1, 1),
-    time: 3600
-  });
-  assert.equal(await clock.getWeekHCount(this.store), '00:00');
-  await helper.deleteModel(time);
-});
-
-test('getDayHCount  no day count yet #unit-clock-test-10', 
+test('getWeekHCount  no week count yet #unit-clock-mod-07', 
   async function(assert){
     let result = await clock.getWeekHCount(this.store);
-    assert.equal(result, '00:00');
+    assert.equal(result, '00:00:00');
     let times = await this.store.findAll('time');
     for(let time of times.toArray())
       await helper.deleteModel(time);
 });
 
-test('start  and resets the clock #unit-clock-test-11', 
+test('start  and resets the clock #unit-clock-mod-08', 
   async function(assert){
     return new rsvp.Promise((resolve) => {
       let times = {

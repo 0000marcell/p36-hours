@@ -1,7 +1,7 @@
+import PouchDB from 'pouchdb';
 import { run } from '@ember/runloop';
 import { moduleFor, test } from 'ember-qunit';
 import mock from 'p36-hours/p36-hours/mock';
-import rsvp from 'rsvp';
 import helper from '../../helpers/store';
 
 moduleFor('mock',
@@ -9,8 +9,10 @@ moduleFor('mock',
     integration: true,
     beforeEach(){
       this.store = this.container.lookup('service:store');
-      this.adapter = this.container.lookup('adapter:application');
       helper.setStore(this.store);
+      this.adapter = this.store.adapterFor('application'); 
+      this.adapter
+        .changeDb(new PouchDB(`test-${new Date().getTime()}`));
     }
 });
 
@@ -49,32 +51,31 @@ const obj = {
     ]
   };
 
-test('create one task in the store based on a object #unit-mock-01', async function(assert) {
-  await run(async () => {
-    let taskObj = obj.tasks[0];
-    
-    let task = await mock.createTask(this.store, taskObj, []);
-    
-    assert.equal(task.get('name'), 
-      'task 1', 'created task have a name');
+test('create one task in the store based on an object #unit-mock-01', async function(assert) {
+  let taskObj = obj.tasks[0];
+ 
+  let task = await mock.createTask(this.store, taskObj);
+  
+  assert.equal(task.get('name'), 
+    'task 1', 'created task have a name');
 
-    let storedTask = await this.store.find('task', task.get('id'));
-    assert.equal(storedTask.get('name'), task.get('name'), 
-      'crated task have the same name')
-    let taskChild = storedTask.get('children').objectAt(0);
-    assert.equal(taskChild.get('name'), 'task 3', 
-      'task child has the right name');
+  let storedTask = await this.store.find('task', task.get('id'));
 
-    assert.equal(taskChild.get('parent.name'), 'task 1', 
-      'save parent on the child');
+  assert.equal(storedTask.get('name'), task.get('name'), 
+    'crated task have the same name')
+  let taskChild = storedTask.get('children').objectAt(0);
+  assert.equal(taskChild.get('name'), 'task 3', 
+    'task child has the right name');
 
-    let tags = await storedTask.get('tags');
-    assert.equal(tags.get('length'), 2, 'task has 2 tags');
-    
-    let pomodoros = await storedTask.get('pomodoros');
-    assert.equal(pomodoros.get('length'), 3, 
-      'task has 4 pomodoros');
-  });
+  assert.equal(taskChild.get('parent.name'), 'task 1', 
+    'save parent on the child');
+
+  let tags = await storedTask.get('tags');
+  assert.equal(tags.get('length'), 2, 'task has 2 tags');
+  
+  let pomodoros = await storedTask.get('pomodoros');
+  assert.equal(pomodoros.get('length'), 3, 
+    'task has 4 pomodoros');
 });
 
 test('create one task without children pomodoros or tags #unit-mock-02', 
@@ -100,7 +101,6 @@ test('create one task without children pomodoros or tags #unit-mock-02',
 
 test('delete one task with associations #unit-mock-03', 
   async function(assert) {
-  await run(async () => {
     let taskObj = {
       name: 'task 1',
       status: 'active',
@@ -111,77 +111,71 @@ test('delete one task with associations #unit-mock-03',
       ],
       tags: ['javascript', 'ruby']
     };
-
-    let task = await mock.createTask(this.store, taskObj, []);
     
-    let pomodoros = await task.get('pomodoros');
-    for(let pomodoro of pomodoros.toArray()){
-      await run(async () => {
-        await pomodoro.destroyRecord();
-      });
-    }
-
-    let tags = await task.get('tags');
-    for(let tag of tags.toArray()){
-      await run(async () => {
-        await tag.destroyRecord();
-      });
-    }
-
+    let task;
     await run(async () => {
-      await task.destroyRecord();
+      task = await mock.createTask(this.store, taskObj);
     });
+    let delIds = await mock.deleteTask(task);
 
-    return new rsvp.Promise((resolve) => {
-      setTimeout(async () => {
-        let tasks = await this.store.findAll('task');
-        assert.equal(tasks.get('length'), 0, 
-          'no tasks in the store');
+    assert.equal(delIds[0], task.get('id'), 
+      'has the same id!');
+    
+    let tasks = await this.store.findAll('task');
+    assert.equal(tasks.get('length'), 0, 
+      'no tasks in the store');
 
-        let pomodoros = await this.store.findAll('pomodoro');
-        assert.equal(pomodoros.get('length'), 0, 
-          'has no pomodoros');
-        
-        let tags = await this.store.findAll('tag');
-        assert.equal(tags.get('length'), 0, 
-          'no tags in the store');
+    let pomodoros = await this.store.findAll('pomodoro');
+    assert.equal(pomodoros.get('length'), 0, 
+      'has no pomodoros');
 
-        resolve();
-      }, 100);
-    });
-  });
+    let tags = await this.store.findAll('tag');
+    assert.equal(tags.get('length'), 2, 
+      'the tag are still in the store');
 });
-
 
 test('load all data in to the store #unit-mock-04', 
   async function(assert){
-    await run(async () => {
-      await mock.constructDbFromObj(this.store, obj);
+    await mock.constructDbFromObj(this.store, obj);
 
-      return new rsvp.Promise((resolve) => {
-        setTimeout(async () => {
-          let tasks = await this.store.findAll('task');
-          assert.equal(tasks.get('length'), 3, 
-            '2 tasks in the store');
+    let tasks = await this.store.findAll('task');
+    assert.equal(tasks.get('length'), 3, 
+      '2 tasks in the store');
 
-          let pomodoros = await this.store.findAll('pomodoro');
 
-          assert.equal(pomodoros.get('length'), 9, 
-            '6 pomodoros in the store');
+    let relTask = tasks.findBy('name', 'task 1');
+    assert.equal(relTask.get('children').objectAt(0).get('name'), 
+      'task 3', 
+      'retrieve relationship!')
 
-          let tags = await this.store.findAll('tag');
-          assert.equal(tags.get('length'), 2, 
-            '2 tags in the store');
+    let pomodoros = await this.store.findAll('pomodoro');
+    assert.equal(pomodoros.get('length'), 9, 
+      '6 pomodoros in the store');
 
-          resolve();
-        }, 1000);
-      });
-    });
+    let tags = await this.store.findAll('tag');
+    assert.equal(tags.get('length'), 2, 
+      '2 tags in the store');
 });
 
+test('delete all tasks and children #unit-mock-05', 
+  async function(assert){
+    let taskObj = {tasks: []};
+    taskObj.tasks.push(obj.tasks[0]);
+    await mock.constructDbFromObj(this.store, taskObj);
+    await mock.deleteAll(this.store);
+    let tasks = await this.store.findAll('task');
+    assert.equal(tasks.get('length'), 0, 
+      'no tasks in the store');
 
-/*
-test('unload all data from the store #unit-mock-05', 
+    let pomodoros = await this.store.findAll('pomodoro');
+    assert.equal(pomodoros.get('length'), 0, 
+      'no pomodoros in the store');
+
+    let tags = await this.store.findAll('tag');
+    assert.equal(tags.get('length'), 0, 'no tags in the store');
+});
+
+test('unload all data from the store #unit-mock-06', 
   async function(assert){
     await run(async () => {
       await mock.constructDbFromObj(this.store, obj);
@@ -199,78 +193,7 @@ test('unload all data from the store #unit-mock-05',
     });
 });
 
-test('delete all tasks #unit-mock-00', 
-  async function(assert) {
-  await run(async () => {
-    let tasksObj = {
-      tasks: 
-        [
-          {
-            name: 'task 1',
-            status: 'active',
-            pomodoros: [
-              { date: new Date(2015, 1, 1) },
-              { date: new Date(2015, 1, 2) },
-              { date: new Date(2015, 1, 3) }
-            ],
-            tags: ['javascript', 'ruby']
-          },
-          {
-            name: 'task 2',
-            status: 'active',
-            pomodoros: [
-              { date: new Date(2015, 1, 1) },
-              { date: new Date(2015, 1, 2) },
-              { date: new Date(2015, 1, 3) }
-            ],
-            tags: ['javascript', 'ruby']
-          }
-      ]
-    };
-    
-
-    let task = await mock.createTask(this.store, tasksObj, []);
-    
-    let pomodoros = await task.get('pomodoros');
-    for(let pomodoro of pomodoros.toArray()){
-      await run(async () => {
-        await pomodoro.destroyRecord();
-      });
-    }
-
-    let tags = await task.get('tags');
-    for(let tag of tags.toArray()){
-      await run(async () => {
-        await tag.destroyRecord();
-      });
-    }
-
-    await run(async () => {
-      await task.destroyRecord();
-    });
-
-    return new rsvp.Promise((resolve) => {
-      setTimeout(async () => {
-        let tasks = await this.store.findAll('task');
-        assert.equal(tasks.get('length'), 0, 
-          'no tasks in the store');
-
-        let pomodoros = await this.store.findAll('pomodoro');
-        assert.equal(pomodoros.get('length'), 0, 
-          'has no pomodoros');
-        
-        let tags = await this.store.findAll('tag');
-        assert.equal(tags.get('length'), 0, 
-          'no tags in the store');
-
-        resolve();
-      }, 100);
-    });
-  });
-});
-
-
-
+/*
 test('build store from obj #unit-mock-00', async function(assert){
   await run(async () => {
     let returnedValues = 

@@ -8,5 +8,8 @@ export default Route.extend({
       pomodoros: this.store.findAll('pomodoro'),
       tags: this.store.findAll('tag')
     });
+  },
+  afterModel(){
+    this.transitionTo('clock');
   }
 });

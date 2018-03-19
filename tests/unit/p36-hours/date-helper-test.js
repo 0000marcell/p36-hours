@@ -5,9 +5,10 @@ test('get lastXDays #unit-date-helper-01', function(assert){
   let dates = dateHelper.lastXDays(14);
   
   assert.equal(dates.length, 14, '14 dates');
-  let today = new Date();
-  today.setHours(0, 0, 0, 0);
-  assert.equal(dates[13].getTime(), today.getTime(), 
+  let yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setHours(0, 0, 0, 0);
+  assert.equal(dates[13].getTime(), yesterday.getTime(), 
     'last day is equal to today');
 });
 
@@ -24,7 +25,7 @@ test('get sunday of the given date #unit-date-helper-03',
   let date = new Date(2015, 1, 3);
   let result = dateHelper.currSunday(date);
   assert.deepEqual(result, 
-    new Date(2015, 1, 1));
+    new Date(2015, 1, 8));
 });
 
 test('compare two dates #unit-date-helper-04', function(assert){

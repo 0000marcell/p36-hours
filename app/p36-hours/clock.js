@@ -1,10 +1,12 @@
 import { run } from '@ember/runloop';
 import dateHelper from 'p36-hours/p36-hours/date-helper';
+import filters from 'p36-hours/p36-hours/filters';
 import { set, get } from '@ember/object';
 
 
 const HOUR = 3600,
-      MIN = 60;
+      MIN = 60,
+      POMODORO = 1500;
 
 export default {
   start(time, cb, finished){
@@ -50,7 +52,6 @@ export default {
     }else if(format === 'hour'){
       return splitTime[0] * HOUR + splitTime[1] * MIN + splitTime[2];
     }
-    
   },
   convertToMin(time){
     let min = Math.floor(time/ MIN),
@@ -79,31 +80,21 @@ export default {
     return `${hours}:${min}:${sec}`;
   },
   async getDayHCount(store){
-    let dayCount;
-    let times = await store.findAll('time');
-    dayCount = times.findBy('name', 'day');
-    if(!dayCount){
-      await run(async () => {
-        dayCount = await store.createRecord('time', {
-          name: 'day',
-          date: new Date(),
-          time: 0
-        }).save();
-      });
-    }
-
-    let dayCountDate = new Date(get(dayCount, 'date')),
-        today = new Date();
-    if(!dateHelper.compareDates(dayCountDate, today)){
-      await run(async () => {
-        set(dayCount, 'date', new Date());
-        set(dayCount, 'time', 0);
-        await dayCount.save();
-      });
-    }
-    return this.convertToHour(get(dayCount, 'time'));
+    let pomodoros = await store.findAll('pomodoro');
+    pomodoros = filters.pomodorosHaveDate(pomodoros, new Date());
+    return this.convertToHour(pomodoros.get('length') * POMODORO);
   },
   async getWeekHCount(store){
+    let pomodoros = await store.findAll('pomodoro'),
+        currMonday = dateHelper.currMonday(new Date),
+        currSunday = dateHelper.currSunday(new Date);
+
+    pomodoros = filters.pomodorosInRange(pomodoros, 
+          currMonday, currSunday); 
+
+    return this.convertToHour(pomodoros.get('length') * POMODORO);
+  },
+  async getWeekHCount2(store){
     let weekCount;
     let times = await store.findAll('time');
 

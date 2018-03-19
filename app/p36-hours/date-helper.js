@@ -1,6 +1,6 @@
 export default {
   lastXDays(num){
-    let days = num - 1,
+    let days = num,
         dates = [],
         date = new Date();
     date.setHours(0, 0, 0, 0);
@@ -10,7 +10,6 @@ export default {
       dates.push(new Date(date.getTime()));
       date.setDate(date.getDate() + 1)
     }
-    dates.push(new Date(date.getTime()));
     return dates;
   },
   datesRange(startDate, endDate){
@@ -31,11 +30,12 @@ export default {
         diff = d.getDate() - day + (day == 0 ? -6:1); 
     return new Date(d.setDate(diff));
   },
+  // sunday assuming the first day is monday
   currSunday(d){
     d = new Date(d);
     let day = d.getDay(),
         diff = d.getDate() - day;
-    return new Date(d.setDate(diff));
+    return new Date(d.setDate(diff + 7));
   },
   compareDates(date1, date2){
     date1 = new Date(date1);

@@ -1,7 +1,8 @@
 let arr1 = [1, 2, 3],
-    arr2 = [3, 4, 5];
+    arr2 = [2, 4, 5];
 
-arr1 = arr1.concat(...arr2);
+let searchItem = 1;
 
-console.log(arr1);
+let results = arr1.find((val) => ( val === searchItem ));
 
+console.log(results);
