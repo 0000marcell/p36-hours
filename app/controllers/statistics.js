@@ -1,5 +1,5 @@
 import Controller from '@ember/controller';
-import { set, get } from '@ember/object';
+import { set, setProperties, get } from '@ember/object';
 import statistics from '../p36-hours/statistics';
 import { all } from 'rsvp';
 import helpers from '../p36-hours/helpers';
@@ -29,52 +29,25 @@ export default Controller.extend({
     async buildData(){
       set(this, 'isLoading', true);
       let items = get(this, 'selectedItems'),
-          mode = get(this, 'selectedMode');
+          mode = get(this, 'selectedMode'),
+          calendarChartData,
+          radarChartData;
       if(mode === 'tasks'){
-        let requests = [],
-            allPomodoros = [],
-            allTasks = [];
-        items.forEach((item) => {
-          allTasks.push(item.model);
-          requests.push(
-            item.model.get('pomodoros').then((pomodoros) => {
-              allPomodoros = 
-                allPomodoros.concat(...pomodoros.toArray());
-            })
-          );
-        });
-        all(requests).then(() => {
-          set(this, 'calendarChartData', 
-            statistics.calendarChart(allPomodoros));
-          statistics.radarChart(allTasks).then((radarChartData) => {
-            set(this, 'radarChartData',
-              radarChartData);
-            set(this, 'isLoading', false);
-          });
-        });
+        items = items.map((item) => ( item.model ));
+        //calendarChartData = statistics.calendarChart(items);
+        radarChartData = await statistics.radarChart(items);
       }else{
-        let tags = get(this, 'selectedItems');
-        
-        statistics.radarChartDataBasedOnTags(tags)
-          .then((data) => {
-            statistics.radarChart(data).then((radarChartData) => {
-              set(this, 'radarChartData', radarChartData);
-              set(this, 'isLoading', false);
-            });
-          });
-
-        let allPomodoros = [];
-        for(let tag of tags){
-          let tasks = await tag.get('tasks').toArray();
-          for(let task of tasks){
-            let pomodoros = await task.get('pomodoros');
-            allPomodoros = 
-              allPomodoros.concat(...pomodoros.toArray());
-          }
-        }
-        set(this, 'calendarChartData', 
-          statistics.calendarChart(allPomodoros));
+        //calendarChartData = 
+          //statistics.calendarChartBasedOnTags(items);
+        radarChartData = 
+          await statistics.radarChartDataBasedOnTags(items);
       }
+      setProperties(this, {
+        isLoading: false,
+        radarChartData: radarChartData,
+        //calendarChartData: calendarChartData,
+      });
+
     }
   }
 });

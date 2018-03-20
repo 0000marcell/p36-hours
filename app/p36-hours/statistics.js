@@ -2,7 +2,6 @@ import filters from './filters';
 import { timeFormat } from 'd3-time-format';
 import dateHelper from './date-helper';
 import { get } from '@ember/object';
-import rsvp from 'rsvp';
 
 export default {
   lineChart(pomodoros, startDate, endDate){
@@ -53,21 +52,6 @@ export default {
                                   lastMonday, thisDayLastWeek);
     return currPomodoros.length - lastWPomodoros.length;
   },
-  lastMonthComparison(pomodoros){
-    let today = new Date(),
-        firstDayMonth = new Date(today.getFullYear(), 
-          today.getMonth(), 1),
-        firstDayLastMonth = new Date(today.getFullYear(), 
-          today.getMonth() - 1, 1),
-        thisDayLastMonth = new Date(today.getFullYear(), 
-          today.getMonth() - 1, today.getDate());
-    let currPomodoros = filters.pomodorosInRange(pomodoros, 
-                                  firstDayMonth, today),
-        lastMPomodoros = filters.pomodorosInRange(pomodoros, 
-                                  firstDayLastMonth, 
-                                  thisDayLastMonth);
-    return currPomodoros.length - lastMPomodoros.length;
-  },
   calendarChart(pomodoros){
     let formatTime = timeFormat("%Y-%m-%d"),
         resultObj = {};
@@ -81,73 +65,90 @@ export default {
     });
     return resultObj;
   },
-  buildRadarData(obj){
-    let results = [],
-        promises = [];
-    return new rsvp.Promise((resolve) => {
-      obj.forEach((item) => {
-        promises.push(
-          Promise.resolve(get(item, 'pomodoros'))
-            .then((pomodoros) => {
-            results.push({ axis: get(item, 'name'),
-              value: pomodoros.length });
-          })
-        );
-      });
-      rsvp.all(promises).then(() => { 
-        let itemsTotal = results.reduce((acc, item) => {
-          return item.value + acc;
-        }, 0);
-        results = results.map((item) => {
-          item.value = Math.trunc(item.value * 100/itemsTotal)/100;
-          return item;
-        });
-        resolve([results]) 
-      });
-    });
-  },
-  radarChart(obj){
-    return new rsvp.Promise((resolve) => {
-      let promises = [];
-      if(get(obj, 'length') > 2){
-          promises.push(
-            this.buildRadarData(obj).then((results) => {
-              resolve(results);
-            })
-          );
-      }else{
-        obj.forEach((item) => {
-          if(get(item, 'children.length') > 2){
-            promises.push(
-              this.buildRadarData(obj).then((results) => {
-                resolve(results);
-              })
-            );
-          }
-        });
+  // get all ids from all children tasks
+  async getChildrenIds(task){
+    let ids = [];
+    ids.push(task.get('id'));
+    if(task.get('children.length')){
+      for(let child of task.get('children').toArray()){
+        ids = 
+          ids.concat(...await this.getChildrenIds(child));
       }
-      rsvp.all(promises).then((results) => { resolve(results)});
-    });
+    }
+    return ids;
   },
-  async radarChartDataBasedOnTags(tags){
-    let resultObj = [],
-        completedTasks = [];
-    for(let tag of tags){
-      let tasks = await tag.get('tasks').toArray(),
-          allPomodoros = [];
-      for(let task of tasks){
-        if(completedTasks.indexOf(task.get('id')) === -1){
-          let pomodoros = await task.get('pomodoros');
-          allPomodoros = 
-                allPomodoros.concat(...pomodoros.toArray());
-          completedTasks.push(task.get('id'));
+  // get all pomodoros of a task and child tasks
+  async getAllPomodoros(task){
+    let pomodoros = await task.get('pomodoros').toArray();
+    if(task.get('children.length')){
+      for(let child of task.get('children').toArray()){
+        pomodoros = 
+          pomodoros.concat(...await this.getAllPomodoros(child));
+      }
+    }
+    return pomodoros;
+  },
+  radarPercentage(results){
+    let itemsTotal = results.reduce((acc, item) => {
+      return item.value + acc;
+    }, 0);
+
+    results = results.map((item) => {
+      item.value = Math.trunc(item.value * 100/itemsTotal)/100;
+      return item;
+    });
+
+    return results;
+  },
+  async buildRadarData(taskArr){
+    let results = [];
+
+    for(let task of taskArr){
+      let pomodoros = await this.getAllPomodoros(task);
+      results.push({ axis: get(task, 'name'),
+            value: pomodoros.length });
+    }
+
+    return [this.radarPercentage(results)];
+  },
+  async radarChart(taskArr){
+    let results;
+    if(get(taskArr, 'length') > 2){
+      results = await this.buildRadarData(taskArr);
+    }else{
+      for(let task of taskArr){
+        let children = get(task, 'children');
+        if(children.get('length') > 2){
+          results = await this.buildRadarData(children.toArray());
+          break;
         }
       }
+    }
+    
+    return results;
+  },
+  async radarChartDataBasedOnTags(tags){
+    let resultObj = [];
+    for(let tag of tags){
+      let tasks = await tag.get('tasks'),
+          allPomodoros = [],
+          completedTasks = [];
+      for(let task of tasks.toArray()){
+        if(completedTasks.indexOf(task.get('id')) === -1){
+          let pomodoros = await this.getAllPomodoros(task),
+              ids = await this.getChildrenIds(task);
+          allPomodoros = 
+                allPomodoros.concat(...pomodoros.toArray());
+          completedTasks = completedTasks.concat(...ids);
+        }
+      }
+
       resultObj.push({
         name: get(tag, 'name'),
-        pomodoros: allPomodoros 
+        value: allPomodoros.get('length')
       });
     }
-    return resultObj;
+
+    return [this.radarPercentage(resultObj)];
   }
 }

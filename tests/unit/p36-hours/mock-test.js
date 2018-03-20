@@ -148,6 +148,9 @@ test('load all data in to the store #unit-mock-04',
       'task 3', 
       'retrieve relationship!')
 
+    assert.equal(relTask.get('pomodoros.length'), 3, 
+      'can get pomodoros from the task side');
+
     let pomodoros = await this.store.findAll('pomodoro');
     assert.equal(pomodoros.get('length'), 9, 
       '6 pomodoros in the store');

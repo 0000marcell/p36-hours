@@ -1,77 +1,83 @@
 import { run } from '@ember/runloop';
+import PouchDB from 'pouchdb';
 import { moduleFor, test } from 'ember-qunit';
 import statistics from 'p36-hours/p36-hours/statistics';
+import dateHelper from 'p36-hours/p36-hours/date-helper';
+import fakeData from 'p36-hours/p36-hours/fake-data';
+import helper from '../../helpers/store';
 import mock from 'p36-hours/p36-hours/mock';
-
-
-function lastThreeMonthsDates(){
-  let today = new Date(),
-      threeMonthsAgo = new Date(today.getFullYear(), 
-        today.getMonth() - 3),
-      newDate = threeMonthsAgo,
-      dates = [];
-  while(newDate < today){
-    dates.push(new Date(newDate));
-    newDate.setDate(newDate.getDate() + 1);
-  }
-  return dates;
-}
-
-let dates = lastThreeMonthsDates();
-
-const obj = {
-    tasks: [
-      {
-        name: 'task 1',
-        status: 'active',
-        pomodoros: [
-          { date: new Date(2015, 1, 1) },
-          { date: new Date(2015, 1, 2) },
-          { date: new Date(2015, 1, 3) }
-        ]
-      },
-      {
-        name: 'task 2',
-        status: 'active',
-        pomodoros: [
-          { date: new Date(2015, 1, 1) },
-          { date: new Date(2015, 1, 2) },
-          { date: new Date(2015, 1, 3) }
-        ]
-      }
-    ]
-  };
-
 
 moduleFor('statistics',
   'Unit | p36-hours | statistics',{
     integration: true,
     async beforeEach(){
       this.store = this.container.lookup('service:store');
-      for(let date of dates){
-        await run(async () => {
-          await this.store.createRecord('pomodoro', {
-            date: date
-          }).save()
-        });
-      }
-    },
-    async afterEach(){
-      /*
-      await run(async () => {
-        await mock.deleteAll(this.store);
-      });
-      */
+      helper.setStore(this.store);
+      this.adapter = this.store.adapterFor('application'); 
+      this.adapter
+        .changeDb(new PouchDB(`test-${new Date().getTime()}`));
     }
 });
 
+const obj = {
+  tasks: [
+    {
+      name: 'task 1',
+      status: 'active',
+      pomodoros: [
+        { date: new Date(2015, 1, 1) },
+        { date: new Date(2015, 1, 2) },
+        { date: new Date(2015, 1, 3) }
+      ]
+    },
+    {
+      name: 'task 2',
+      status: 'active',
+      pomodoros: [
+        { date: new Date(2015, 1, 1) },
+        { date: new Date(2015, 1, 2) },
+        { date: new Date(2015, 1, 3) }
+      ]
+    }
+  ]
+};
+
+const radarChartResult = [
+  {
+    "axis": "planning",
+    "value": 0.07
+  },
+  {
+    "axis": "buying material",
+    "value": 0.15
+  },
+  {
+    "axis": "cutting",
+    "value": 0.23
+  },
+  {
+    "axis": "assembling",
+    "value": 0.23
+  },
+  {
+    "axis": "polishing",
+    "value": 0.3
+  }
+];
+
 test('construct line chart object data #unit-statistics-01', 
   async function(assert){
-    let pomodoros = await this.store.findAll('pomodoro');
-    let twoWeeksAgo = new Date();
-    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 13);
-    let results = statistics.lineChart(pomodoros, 
-      twoWeeksAgo, new Date());
+    let twoWeekDates = dateHelper.lastXDays(14);
+    for(let date of twoWeekDates){
+      await helper.createModel('pomodoro', {
+        date: date
+      });
+    }
+
+    let pomodoros = await this.store.findAll('pomodoro'),
+        results = statistics.lineChart(pomodoros, 
+      twoWeekDates[0], new Date());
+
     assert.equal(Object.keys(results).length, 14, 
       'return 14 days of the last two weeks');
     assert.equal(results[0].value, 1, 
@@ -80,20 +86,39 @@ test('construct line chart object data #unit-statistics-01',
 
 test('construct week comparison #unit-statistics-02', 
   async function(assert){
-    let pomodoros = await this.store.findAll('pomodoro');
-    let result = statistics.lastWeekComparison(pomodoros);
-    assert.equal(result, 0);
-  });
+    let today = new Date(),
+        lastWeekDate = new Date();
+    lastWeekDate.setDate(today.getDate() - 7);
 
-test('construct month comparison #unit-statistics-03', 
-  async function(assert){
-    await this.store.findAll('pomodoro').then((pomodoros) => {
-      let result = statistics.lastMonthComparison(pomodoros);
-      assert.equal(result, 0);
+    let thisWeekDates = dateHelper
+          .datesRange(dateHelper.currMonday(today), 
+            dateHelper.currSunday(today)),
+        lastWeekDates = dateHelper
+          .datesRange(dateHelper.currMonday(lastWeekDate), 
+            dateHelper.currSunday(lastWeekDate));
+
+    for(let date of thisWeekDates){
+      await helper.createModel('pomodoro', {
+        date: date
+      });
+    }
+
+    await helper.createModel('pomodoro', {
+      date: new Date()
     });
+
+    for(let date of lastWeekDates){
+      await helper.createModel('pomodoro', {
+        date: date
+      });
+    }
+
+    let pomodoros = await this.store.findAll('pomodoro'),
+        result = statistics.lastWeekComparison(pomodoros);
+    assert.equal(result, 1);
   });
 
-test('format text from the comparison #unit-statistics-04', 
+test('format text from the comparison #unit-statistics-03', 
   function(assert){
   assert.equal(statistics.formatComparison(0), 
     'about the same time');
@@ -107,7 +132,7 @@ test('format text from the comparison #unit-statistics-04',
   assert.equal(statistics.formatComparison(-4), '2 hours less');
 });
 
-test('build calendar chart data #unit-statistics-05', 
+test('build calendar chart data #unit-statistics-04', 
   function(assert){
   let pomodoros = [
     {date: new Date(2013, 1, 2).toString()},
@@ -124,76 +149,170 @@ test('build calendar chart data #unit-statistics-05',
   assert.deepEqual(result, expected);
 });
 
+test('getAllPomodoros from a task #unit-statistics-05', 
+  async function(assert){
+  
+  let tasks = await mock.constructDbFromObj(this.store, fakeData);
+
+  let allPomodoros = 
+      await statistics.getAllPomodoros(tasks.objectAt(0));
+
+  assert.equal(allPomodoros.get('length'),
+    39, 'build radar chart data');
+});
+
+
+
 test('build radar chart data #unit-statistics-06', 
   async function(assert){
   
   let tasks = await mock.constructDbFromObj(this.store, fakeData),
-      task = task.objectAt(0);
+      childrenTasks = tasks.objectAt(0).get('children');
 
-  let expected = [
-    [ 
-      {axis:'task 0', value: 0.33},
-      {axis:'task 1', value: 0.33},
-      {axis:'task 2', value: 0.33},
-    ]
-  ];
+  
 
-  assert.deepEqual(await statistics.radarChart(task), 
-      expected, 'load data for three tasks!');
-  assert.deepEqual(await statistics.radarChart(twoTasks), 
-    [], 'return a empty array if the data is not valid');
-  assert.deepEqual(await statistics.radarChart(threeTasks), 
-    expected, 'load data for nestedTasks!');
+  let result = await statistics
+      .buildRadarData(childrenTasks.toArray());
 
+  assert.deepEqual(result[0], 
+    radarChartResult, 'build radar chart data');
 });
 
-let tagsObj = [
-  {name: 'tag 1'},
-  {name: 'tag 2'},
-  {name: 'tag 3'}
-];
-
-
-async function createTagsData(store){
-  let tasks;
-  await run(async () => {
-    tasks = await mock.constructDbFromObj(store, obj);
-  });
-  let tags = [];
-  for(let tag of tagsObj){
-    await run(async () => {
-      tags.push(
-        await store.createRecord('tag', {
-          name: tag.name,
-          tasks: tasks
-        }).save()
-      );
-    });
-  }
-  return tags;
-}
-
-test('radar chart from tags #unit-statistics-07', 
+test('build radar chart #unit-statistics-07', 
   async function(assert){
-    let expected = [
-      [
+  
+  let tasks = await mock.constructDbFromObj(this.store, fakeData),
+      task = tasks.objectAt(0);
+
+  let results = await statistics.radarChart([task]);
+
+  assert.deepEqual(results[0], radarChartResult, 
+    'create radar chart based on one task');
+
+  let children = task.get('children');
+
+  results = await statistics.radarChart(children.toArray());
+
+  assert.deepEqual(results[0], radarChartResult, 
+    'create radar chart based on multiple tasks');
+});
+
+test('get children ids #unit-statistics-08', 
+  async function(assert){
+
+  let tasks = await mock.constructDbFromObj(this.store, fakeData),
+      allIds = 
+        await statistics.getChildrenIds(tasks.objectAt(0));
+
+  assert.equal(allIds.length,
+    6, 'number of ids received');
+});
+
+
+
+test('radarPercentage #unit-statistics-09', 
+  async function(assert){
+    let results = [
+      {
+        name: 'task 1',
+        value: 3
+      }, 
+      {
+        name: 'task 2',
+        value: 3
+      },
+      {
+        name: 'task 3',
+        value: 3
+      },
+    ];
+
+    let expect = [
+      {
+        name: 'task 1',
+        value: 0.33 
+      }, 
+      {
+        name: 'task 2',
+        value: 0.33
+      },
+      {
+        name: 'task 3',
+        value: 0.33
+      },
+    ];
+    assert.deepEqual(statistics.radarPercentage(results), expect, 
+      'returns percentage of the pomodoros');
+});
+
+let tagsTaskObj = {
+  tasks: [
+    {
+      name: 'task 1',
+      status: 'active',
+      pomodoros: [
+        { date: new Date() },
+        { date: new Date() }, 
+        { date: new Date() }
+      ],
+      tags: [],
+      children: [
         {
-          "axis": "tag 1",
-          "value": 0.33
+          name: 'task 11',
+          status: 'active',
+          pomodoros: [
+            { date: new Date() }, 
+            { date: new Date() }, 
+            { date: new Date() }
+          ],
+          tags: ['tag1']
         },
         {
-          "axis": "tag 2",
-          "value": 0.33
+          name: 'task 12',
+          status: 'active',
+          pomodoros: [
+            { date: new Date() }, 
+            { date: new Date() }, 
+            { date: new Date() }
+          ],
+          tags: ['tag2']
         },
         {
-          "axis": "tag 3",
-          "value": 0.33
+          name: 'task 13',
+          status: 'active',
+          pomodoros: [
+            { date: new Date() }, 
+            { date: new Date() }, 
+            { date: new Date() }
+          ],
+          tags: ['tag3']
         }
       ]
-    ];
-    let tags = await createTagsData(this.store),
-        results = await statistics.radarChartDataBasedOnTags(tags);
-    assert.equal(results.length, 3);
-    assert.equal(results[0].pomodoros.length, 6) 
-    assert.deepEqual(await statistics.radarChart(results), expected);
+    },
+    {
+      name: 'task 2',
+      status: 'active',
+      pomodoros: [
+        { date: new Date() }, 
+        { date: new Date() }, 
+        { date: new Date() }
+      ],
+      tags: ['tag3']
+    }
+  ]
+};
+
+test('radar chart from tags #unit-statistics-10', 
+  async function(assert){
+
+    await mock.constructDbFromObj(this.store, 
+      tagsTaskObj);
+
+    let tags = await this.store.findAll('tag'),
+        results = await statistics
+          .radarChartDataBasedOnTags(tags.toArray());
+
+    assert.equal(results[0].length, 3);
+    assert.equal(results[0][0].value, 0.5, 
+      'calculates the right amount');
 });

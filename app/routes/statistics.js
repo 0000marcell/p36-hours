@@ -17,18 +17,10 @@ export default Route.extend({
           .formatComparison(lastWeekComparison),
         lastWeekText = `${wcomparisonText} than the previous week`;
     
-    let lastMonthComparison = statistics
-          .lastMonthComparison(model.pomodoros),
-        mcomparisonText = 
-          statistics.formatComparison(lastMonthComparison),
-        lastMonthText = `${mcomparisonText} than the previous month`;
-    
     controller.setProperties({
       lineChartData: lineChartData,
       lastWeekText: lastWeekText,
       lastWeekComparison: lastWeekComparison,
-      lastMonthText: lastMonthText,
-      lastMonthComparison: lastMonthComparison,
       selectedMode: 'tasks',
       modes: ['tasks', 'tags'],
       modeItems: model.tasks.map((task) => (

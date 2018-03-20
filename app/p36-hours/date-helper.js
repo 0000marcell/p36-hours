@@ -37,6 +37,14 @@ export default {
         diff = d.getDate() - day;
     return new Date(d.setDate(diff + 7));
   },
+  firstDayMonth(d){
+    return new Date(d.getFullYear(), 
+      d.getMonth(), 1);
+  },
+  lastDayMonth(d){
+    return new Date(d.getFullYear(), 
+      d.getMonth() + 1, 0);
+  },
   compareDates(date1, date2){
     date1 = new Date(date1);
     date2 = new Date(date2);

@@ -155,14 +155,20 @@ export default {
     });
     
     if(task['pomodoros']){
+      let pomodoros = [],
+          newPom;
       for(let pomodoro of task['pomodoros']){
         await run(async () => {
-          await store.createRecord('pomodoro', {
+          newPom = await store.createRecord('pomodoro', {
             date: new Date(pomodoro.date),
             task: newTask
           }).save();
         });
+        pomodoros.push(newPom);
       }
+      await run(async () => {
+        set(newTask, 'pomodoros', pomodoros);
+      });
     }
 
     if(task['tags']){
@@ -193,91 +199,6 @@ export default {
       set(newTask, 'children', children);
     }
     return newTask;
-  },
-  createTask2(store, task, savedTagsNames){
-    return new rsvp.Promise((resolve) => {
-      return store.createRecord('task', {
-        name: task.name,
-        status: 'active'
-      }).save().then((newTask) => {
-        let savedPomodoros = [],
-            savedTags = [],
-            tagObjects = [],
-            savedChildren = [];
-        if(task['pomodoros']){
-          task.pomodoros.forEach((pomodoro) => {
-            savedPomodoros.push(
-              store.createRecord('pomodoro', {
-                date: new Date(pomodoro.date),
-                task: newTask
-              }).save()
-            );
-          });
-        } 
-        
-        if(task['tags']){
-          task.tags.forEach((tagName) => {
-            if(savedTagsNames.indexOf(tagName) === -1){
-              savedTags.push(
-                store.createRecord('tag', {
-                  name: tagName
-                }).save().then((tag) => {
-                  tagObjects.push(tag);
-                }) 
-              );
-              savedTagsNames.push(tagName);
-            }else{
-              savedTags.push(
-                new rsvp.Promise((resolve) => {
-                  store.findAll('tag').then((tags) => {
-                    tagObjects
-                      .push(tags.findBy('name', tagName))
-                    resolve();
-                  });
-                })
-              );
-            }
-          });
-        }
-        
-        return rsvp.all(savedPomodoros).then(() => {
-          return rsvp.all(savedTags).then(() => {
-            if(task['children']){
-              task.children.forEach((child) => {
-                savedChildren.push(
-                  this.createTask2(store, child, savedTagsNames)
-                );
-              });
-            }
-            return rsvp.all(savedChildren).then(
-              async (children) => {
-              if(children){
-                for(let child of children){
-                  newTask.get('children').pushObject(child);
-                  child.set('parent', newTask);
-                  await run(async () => {
-                    await newTask.save();
-                  });
-                  await run(async () => {
-                    await child.save();
-                  });
-                }
-              }
-              
-              if(tagObjects){
-                tagObjects.forEach((tag) => {
-                  newTask.get('tags').pushObject(tag);
-                });
-              }
-              
-              newTask.save().then((task) => {
-                resolve(task);
-              });
-            });
-          });
-        });
-      });
-    });
   },
   constructDbFromObj(store, obj){
     return new rsvp.Promise((resolve) => {
