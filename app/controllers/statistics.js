@@ -1,7 +1,6 @@
 import Controller from '@ember/controller';
 import { set, setProperties, get } from '@ember/object';
 import statistics from '../p36-hours/statistics';
-import { all } from 'rsvp';
 import helpers from '../p36-hours/helpers';
 
 export default Controller.extend({
@@ -34,18 +33,21 @@ export default Controller.extend({
           radarChartData;
       if(mode === 'tasks'){
         items = items.map((item) => ( item.model ));
-        //calendarChartData = statistics.calendarChart(items);
-        radarChartData = await statistics.radarChart(items);
+        calendarChartData = await statistics
+          .calendarChartBasedOnTasks(items);
+        radarChartData = await statistics
+          .radarChartBasedOnTasks(items);
       }else{
-        //calendarChartData = 
-          //statistics.calendarChartBasedOnTags(items);
+        calendarChartData = 
+          await statistics.calendarChartBasedOnTags(items);
         radarChartData = 
-          await statistics.radarChartDataBasedOnTags(items);
+          await statistics.radarChartBasedOnTags(items);
       }
+      console.log('calendarChartData: ', calendarChartData);
       setProperties(this, {
         isLoading: false,
         radarChartData: radarChartData,
-        //calendarChartData: calendarChartData,
+        calendarChartData: calendarChartData,
       });
 
     }

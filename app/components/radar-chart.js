@@ -18,19 +18,19 @@ export default Component.extend({
       .querySelector('.radar-chart').innerHTML = '';
     let graph = {
         radius: 5,
-        w: 500,
-        h: 500,
+        w: 250,
+        h: 250,
         factor: 1,
-        factorLegend: .85,
+        factorLegend: 0.85,
         levels: 7,
-        maxValue: 0.6,
+        maxValue: 0,
         radians: 2 * Math.PI,
         opacityArea: 0.5,
         toRight: 5,
         translateX: 80,
         translateY: 30,
-        extraWidthX: 300,
-        extraWidthY: 70
+        extraWidthX: 180,
+        extraWidthY: 100
     };
 
     graph.maxValue = Math.max(graph.maxValue, 

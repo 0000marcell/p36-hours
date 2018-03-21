@@ -154,6 +154,7 @@ export default {
       }).save();
     });
     
+    
     if(task['pomodoros']){
       let pomodoros = [],
           newPom;
@@ -198,6 +199,9 @@ export default {
       }
       set(newTask, 'children', children);
     }
+
+    newTask.save();
+
     return newTask;
   },
   constructDbFromObj(store, obj){

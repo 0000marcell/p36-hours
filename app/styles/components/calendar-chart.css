@@ -1,6 +1,7 @@
-.calendar-chart{
-  width: 800px;
+.calendar-chart svg{
+  display: block;
   margin: 0 auto;
+  padding-left: 150px;
 }
 
 .calendar-chart line{

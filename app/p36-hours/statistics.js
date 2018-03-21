@@ -52,7 +52,8 @@ export default {
                                   lastMonday, thisDayLastWeek);
     return currPomodoros.length - lastWPomodoros.length;
   },
-  calendarChart(pomodoros){
+  
+  calendarChartData(pomodoros){
     let formatTime = timeFormat("%Y-%m-%d"),
         resultObj = {};
     pomodoros.forEach((pomodoro) => {
@@ -64,6 +65,31 @@ export default {
           resultObj[pomDate] + 1 : 1
     });
     return resultObj;
+  },
+  async calendarChartBasedOnTasks(tasks){
+    let pomodoros = [];
+    for(let task of tasks){
+      pomodoros = pomodoros
+        .concat(...await this.getAllPomodoros(task));
+    }
+    return this.calendarChartData(pomodoros); 
+  },
+  async calendarChartBasedOnTags(tags){
+    let allPomodoros = [];
+    for(let tag of tags){
+      let tasks = await tag.get('tasks'),
+          completedTasks = [];
+      for(let task of tasks.toArray()){
+        if(completedTasks.indexOf(task.get('id')) === -1){
+          let pomodoros = await this.getAllPomodoros(task),
+              ids = await this.getChildrenIds(task);
+          allPomodoros = 
+                allPomodoros.concat(...pomodoros.toArray());
+          completedTasks = completedTasks.concat(...ids);
+        }
+      }
+    }
+    return this.calendarChartData(allPomodoros);
   },
   // get all ids from all children tasks
   async getChildrenIds(task){
@@ -79,7 +105,8 @@ export default {
   },
   // get all pomodoros of a task and child tasks
   async getAllPomodoros(task){
-    let pomodoros = await task.get('pomodoros').toArray();
+    let pomodoros = await task.get('pomodoros');
+    pomodoros = pomodoros.toArray();
     if(task.get('children.length')){
       for(let child of task.get('children').toArray()){
         pomodoros = 
@@ -111,7 +138,7 @@ export default {
 
     return [this.radarPercentage(results)];
   },
-  async radarChart(taskArr){
+  async radarChartBasedOnTasks(taskArr){
     let results;
     if(get(taskArr, 'length') > 2){
       results = await this.buildRadarData(taskArr);
@@ -127,7 +154,7 @@ export default {
     
     return results;
   },
-  async radarChartDataBasedOnTags(tags){
+  async radarChartBasedOnTags(tags){
     let resultObj = [];
     for(let tag of tags){
       let tasks = await tag.get('tasks'),

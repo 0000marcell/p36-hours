@@ -6,8 +6,7 @@ export default DS.Model.extend({
   tags: DS.hasMany('tag', {inverse: 'tasks', save: true}),
   parent: DS.belongsTo('task', {inverse: 'children', async: false}),
   children: DS.hasMany('task', {inverse: 'parent', async: false}),
-  pomodoros: DS.hasMany('pomodoro', 
-    { inverse: 'task'}),
+  pomodoros: DS.hasMany('pomodoro', { inverse: 'task'}),
   status: DS.attr('string'),
   rev: DS.attr('string')
 });

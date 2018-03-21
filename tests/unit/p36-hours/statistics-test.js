@@ -1,4 +1,3 @@
-import { run } from '@ember/runloop';
 import PouchDB from 'pouchdb';
 import { moduleFor, test } from 'ember-qunit';
 import statistics from 'p36-hours/p36-hours/statistics';
@@ -19,25 +18,59 @@ moduleFor('statistics',
     }
 });
 
-const obj = {
+let tagsTaskObj = {
   tasks: [
     {
       name: 'task 1',
       status: 'active',
       pomodoros: [
-        { date: new Date(2015, 1, 1) },
-        { date: new Date(2015, 1, 2) },
-        { date: new Date(2015, 1, 3) }
+        { date: new Date() },
+        { date: new Date() }, 
+        { date: new Date() }
+      ],
+      tags: [],
+      children: [
+        {
+          name: 'task 11',
+          status: 'active',
+          pomodoros: [
+            { date: new Date() }, 
+            { date: new Date() }, 
+            { date: new Date() }
+          ],
+          tags: ['tag1']
+        },
+        {
+          name: 'task 12',
+          status: 'active',
+          pomodoros: [
+            { date: new Date() }, 
+            { date: new Date() }, 
+            { date: new Date() }
+          ],
+          tags: ['tag2']
+        },
+        {
+          name: 'task 13',
+          status: 'active',
+          pomodoros: [
+            { date: new Date() }, 
+            { date: new Date() }, 
+            { date: new Date() }
+          ],
+          tags: ['tag3']
+        }
       ]
     },
     {
       name: 'task 2',
       status: 'active',
       pomodoros: [
-        { date: new Date(2015, 1, 1) },
-        { date: new Date(2015, 1, 2) },
-        { date: new Date(2015, 1, 3) }
-      ]
+        { date: new Date() }, 
+        { date: new Date() }, 
+        { date: new Date() }
+      ],
+      tags: ['tag3']
     }
   ]
 };
@@ -133,23 +166,37 @@ test('format text from the comparison #unit-statistics-03',
 });
 
 test('build calendar chart data #unit-statistics-04', 
-  function(assert){
-  let pomodoros = [
-    {date: new Date(2013, 1, 2).toString()},
-    {date: new Date(2013, 1, 2).toString()},
-    {date: new Date(2013, 1, 3).toString()},
-    {date: new Date(2013, 1, 4).toString()}
-  ];
-  let result = statistics.calendarChart(pomodoros),
-      expected = {
-        '2013-02-02': 2,
-        '2013-02-03': 1,
-        '2013-02-04': 1
-      };
-  assert.deepEqual(result, expected);
+  async function(assert){
+  let tasks = await mock.constructDbFromObj(this.store, fakeData),
+      childrenTasks = tasks.objectAt(0).get('children');
+
+  let results = 
+      await statistics
+        .calendarChartBasedOnTasks(childrenTasks.toArray());
+
+  assert.deepEqual(Object.keys(results).length, 12, 
+    'return 12 different dates');
 });
 
-test('getAllPomodoros from a task #unit-statistics-05', 
+test('build calendar chart based on tags #unit-statistics-05', 
+  async function(assert){
+
+  await mock.constructDbFromObj(this.store, tagsTaskObj);
+
+  let tags = await this.store.findAll('tag');
+
+  let results = 
+      await statistics
+        .calendarChartBasedOnTags(tags.toArray());
+
+  assert.equal(Object.keys(results).length, 1, 'just one item');
+  assert.equal(results[Object.keys(results)[0]], 12, 
+    'first item has 12 pomodoros');
+});
+
+
+
+test('getAllPomodoros from a task #unit-statistics-06', 
   async function(assert){
   
   let tasks = await mock.constructDbFromObj(this.store, fakeData);
@@ -163,7 +210,7 @@ test('getAllPomodoros from a task #unit-statistics-05',
 
 
 
-test('build radar chart data #unit-statistics-06', 
+test('build radar chart data #unit-statistics-07', 
   async function(assert){
   
   let tasks = await mock.constructDbFromObj(this.store, fakeData),
@@ -178,30 +225,38 @@ test('build radar chart data #unit-statistics-06',
     radarChartResult, 'build radar chart data');
 });
 
-test('build radar chart #unit-statistics-07', 
+test('build radar chart #unit-statistics-08', 
   async function(assert){
   
   let tasks = await mock.constructDbFromObj(this.store, fakeData),
       task = tasks.objectAt(0);
 
-  let results = await statistics.radarChart([task]);
+  let results = await statistics.radarChartBasedOnTasks([task]);
 
   assert.deepEqual(results[0], radarChartResult, 
     'create radar chart based on one task');
+});
 
-  let children = task.get('children');
+test('build radar chart children #unit-statistics-09', 
+  async function(assert){
+  
+  let tasks = await mock.constructDbFromObj(this.store, fakeData),
+      task = tasks.objectAt(0),
+      children = task.get('children');
 
-  results = await statistics.radarChart(children.toArray());
+  let results = await statistics
+      .radarChartBasedOnTasks(children.toArray());
 
   assert.deepEqual(results[0], radarChartResult, 
     'create radar chart based on multiple tasks');
 });
 
-test('get children ids #unit-statistics-08', 
+test('get children ids #unit-statistics-10', 
   async function(assert){
 
-  let tasks = await mock.constructDbFromObj(this.store, fakeData),
-      allIds = 
+  let tasks = await mock.constructDbFromObj(this.store, fakeData);
+
+  let allIds = 
         await statistics.getChildrenIds(tasks.objectAt(0));
 
   assert.equal(allIds.length,
@@ -210,7 +265,7 @@ test('get children ids #unit-statistics-08',
 
 
 
-test('radarPercentage #unit-statistics-09', 
+test('radarPercentage #unit-statistics-11', 
   async function(assert){
     let results = [
       {
@@ -245,64 +300,9 @@ test('radarPercentage #unit-statistics-09',
       'returns percentage of the pomodoros');
 });
 
-let tagsTaskObj = {
-  tasks: [
-    {
-      name: 'task 1',
-      status: 'active',
-      pomodoros: [
-        { date: new Date() },
-        { date: new Date() }, 
-        { date: new Date() }
-      ],
-      tags: [],
-      children: [
-        {
-          name: 'task 11',
-          status: 'active',
-          pomodoros: [
-            { date: new Date() }, 
-            { date: new Date() }, 
-            { date: new Date() }
-          ],
-          tags: ['tag1']
-        },
-        {
-          name: 'task 12',
-          status: 'active',
-          pomodoros: [
-            { date: new Date() }, 
-            { date: new Date() }, 
-            { date: new Date() }
-          ],
-          tags: ['tag2']
-        },
-        {
-          name: 'task 13',
-          status: 'active',
-          pomodoros: [
-            { date: new Date() }, 
-            { date: new Date() }, 
-            { date: new Date() }
-          ],
-          tags: ['tag3']
-        }
-      ]
-    },
-    {
-      name: 'task 2',
-      status: 'active',
-      pomodoros: [
-        { date: new Date() }, 
-        { date: new Date() }, 
-        { date: new Date() }
-      ],
-      tags: ['tag3']
-    }
-  ]
-};
 
-test('radar chart from tags #unit-statistics-10', 
+
+test('radar chart from tags #unit-statistics-12', 
   async function(assert){
 
     await mock.constructDbFromObj(this.store, 
@@ -310,7 +310,7 @@ test('radar chart from tags #unit-statistics-10',
 
     let tags = await this.store.findAll('tag'),
         results = await statistics
-          .radarChartDataBasedOnTags(tags.toArray());
+          .radarChartBasedOnTags(tags.toArray());
 
     assert.equal(results[0].length, 3);
     assert.equal(results[0][0].value, 0.5, 
