@@ -1,8 +1,10 @@
+import PouchDB from 'pouchdb';
 import { run } from '@ember/runloop';
 import { moduleFor, test } from 'ember-qunit';
 import filters from 'p36-hours/p36-hours/filters';
 import dateHelper from 'p36-hours/p36-hours/date-helper';
 import helper from '../../helpers/store';
+import fakeData from 'p36-hours/p36-hours/fake-data';
 import mock from 'p36-hours/p36-hours/mock';
 import { get } from '@ember/object';
 
@@ -13,8 +15,10 @@ moduleFor('filters',
   integration: true,
   async beforeEach(){
     this.store = this.container.lookup('service:store');
-    //this.adapter = this.container.lookup('adapter:application');
     helper.setStore(this.store);
+    this.adapter = this.store.adapterFor('application'); 
+    this.adapter
+        .changeDb(new PouchDB(`test-${new Date().getTime()}`));
   }
 });
 
@@ -137,4 +141,16 @@ test('rootTasks #unit-filters-04',
       'returns only one task');
     assert.equal(results.objectAt(0).get('name'), 'task 1', 
       'returns the right task!');
+});
+
+test('grab last task done #unit-filters-05', 
+  async function(assert){
+    await mock.constructDbFromObj(this.store, fakeData);
+
+    let pomodoros = await this.store.findAll('pomodoro');
+    
+    let result = await filters.lastTaskDone(pomodoros);
+
+    assert.equal(get(result, 'name'), 'polishing', 
+      'return the right task');
 });

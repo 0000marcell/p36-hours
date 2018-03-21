@@ -1,7 +1,8 @@
-# p36-hours
+# p36-hours [WIP]
 
-This README outlines the details of collaborating on this Ember application.
-A short introduction of this app could easily go here.
+Time tracker web app, local storage with pouch-db and syncronization possibilities with an external server
+
+[DEMO](0000marcell.github.io/p36-hours/#/clock)
 
 ## Prerequisites
 
@@ -25,28 +26,31 @@ You will need the following things properly installed on your computer.
 * Visit your app at [http://localhost:4200](http://localhost:4200).
 * Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
 
-### Code Generators
-
-Make use of the many generators for code, try `ember help generate` for more details
-
 ### Running Tests
 
 * `ember test`
 * `ember test --server`
 
-### Linting
+all tests are named, to run a specific test:
 
-* `yarn lint:js`
-* `yarn lint:js --fix`
+`ember test -s -f <part of the name of the test>`
 
-### Building
+example:
 
-* `ember build` (development)
-* `ember build --environment production` (production)
+`ember test -s -f unit-statistics-01`
+
+some tests are falling because of a bug when closing pouch-db, but the tests are actually green.
 
 ### Deploying
 
-Specify what it takes to deploy your app.
+If you wanna deploy your own version of the app using gh-pages:
+
+after forking the app and installing everything.
+
+`ember deploy production`
+
+the app will be hosted at "<your-username>.github.io/p36-hours/#/clock"
+
 
 ## Further Reading / Useful Links
 

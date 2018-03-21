@@ -31,5 +31,6 @@ export default Route.extend({
         }
       ))
     });
+    controller.afterSeup();
   }
 });

@@ -45,5 +45,9 @@ export default {
       });
     }
     return results;
+  },
+  async lastTaskDone(pomodoros){
+    let pomodoro = pomodoros.get('lastObject');
+    return await pomodoro.get('task');
   }
 }

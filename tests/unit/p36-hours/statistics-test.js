@@ -300,9 +300,22 @@ test('radarPercentage #unit-statistics-11',
       'returns percentage of the pomodoros');
 });
 
-
-
 test('radar chart from tags #unit-statistics-12', 
+  async function(assert){
+
+    await mock.constructDbFromObj(this.store, 
+      tagsTaskObj);
+
+    let tags = await this.store.findAll('tag'),
+        results = await statistics
+          .radarChartBasedOnTags(tags.toArray());
+
+    assert.equal(results[0].length, 3);
+    assert.equal(results[0][0].value, 0.5, 
+      'calculates the right amount');
+});
+
+test('radar chart from tags #unit-statistics-13', 
   async function(assert){
 
     await mock.constructDbFromObj(this.store, 
