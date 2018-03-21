@@ -2,7 +2,7 @@
 
 Time tracker web app, local storage with pouch-db and syncronization possibilities with an external server
 
-[DEMO](0000marcell.github.io/p36-hours/#/clock)
+[APP](https://0000marcell.github.io/p36-hours/#/clock)
 
 ## Prerequisites
 
@@ -49,7 +49,7 @@ after forking the app and installing everything.
 
 `ember deploy production`
 
-the app will be hosted at "<your-username>.github.io/p36-hours/#/clock"
+the app will be hosted at "https://your-username.github.io/p36-hours/#/clock"
 
 
 ## Further Reading / Useful Links
