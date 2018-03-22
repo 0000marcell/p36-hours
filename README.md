@@ -2,6 +2,8 @@
 
 Time tracker web app, local storage with pouch-db and syncronization possibilities with an external server
 
+** THIS APP IS A WORK IN PROGRESS SEE THE ISSUES PAGE BEFORE START USING IT**
+
 [APP](https://0000marcell.github.io/p36-hours/#/clock)
 
 ## Prerequisites
