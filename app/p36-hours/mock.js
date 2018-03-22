@@ -1,6 +1,7 @@
 import rsvp from 'rsvp';
 import { run } from '@ember/runloop';
 import { get, set } from '@ember/object';
+//import awsCred from '../aws-cred';
 
 export default {
   async deleteTask(task, delIds = []){
@@ -208,6 +209,7 @@ export default {
     return new rsvp.Promise((resolve) => {
       let promises = [];
       obj.tasks.forEach((task) => {
+        console.log('gonna create task: ', task.name);
         promises.push(
           this.createTask(store, task)
         );
@@ -221,6 +223,7 @@ export default {
   /*
   grabOldInfo(store){
     return new rsvp.Promise((resolve) => {
+      console.log('gonna delete everything');
       this.deleteAll(store).then(() => {
         let id = awsCred.awsAccessKeyId,
             key = awsCred.awsSecreAccessKey,
@@ -231,6 +234,7 @@ export default {
         let bucket = new AWS.S3({params: {Bucket: 'pomodorog'}});
         bucket.getObject({Key: 'new.json'}, (error, data) => {
           let obj = JSON.parse(data.Body.toString());
+          console.log('gonna construct the new db!');
           this.constructDbFromObj(store, obj).then(() => {
             resolve('db data saved!');
           });

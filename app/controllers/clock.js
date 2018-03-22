@@ -34,9 +34,44 @@ export default Controller.extend({
     set(this, 'taskPath', path);
     set(this, 'selectedTask', item);
   },
+  async timerFinished(){
+    let selectedTask = get(this, 'selectedTask'),
+        pomodoro = await this.get('store')
+      .createRecord('pomodoro', {
+        date: new Date(),
+        task: selectedTask
+    });
+
+    selectedTask.get('pomodoros').pushObject(pomodoro);
+
+    await selectedTask.save().then(async () => {
+      await pomodoro.save();
+    });
+
+    let clock = get(this, 'clock'),
+        time = get(clock, 'time');
+    if(get(clock, 'state') === 'started'){
+      let pomodoros = await this.get('store').findAll('pomodoro'),
+          todayPomodoros = filter
+            .pomodorosHaveDate(pomodoros, new Date());
+
+      set(time, 'pomodoro', 
+        !(todayPomodoros.length % 3) ? '10:00' : '5:00');
+
+      set(clock, 'time', time);
+    }else{
+      set(time, 'pomodoro', '25:00');
+      set(clock, 'time', time);
+    }
+    clock.start();
+  },
   actions: {
     start(){
       let clock = get(this, 'clock');
+
+      if(!get(clock, 'finishFunc'))
+        set(clock, 'finishFunc', this.timerFinished.bind(this));
+
       if(get(this, 'selectedTask')){
         clock.start();
       }else{
@@ -89,33 +124,6 @@ export default Controller.extend({
       get(this, 'stateHelper').set('parentTask', item);
       this.transitionToRoute('tasks.new');
     },
-    async timerFinished(){
-      let pomodoro = this.get('store').createRecord('pomodoro'),
-          selectedTask = get(this, 'selectedTask');
-      pomodoro.set('date', new Date());
-      selectedTask.get('pomodoros').pushObject(pomodoro);
-
-      await selectedTask.save().then(async () => {
-        await pomodoro.save();
-      });
-
-      let clock = get(this, 'clock'),
-          time = get(clock, 'time');
-      if(get(clock, 'state') === 'started'){
-        let pomodoros = await this.get('store').findAll('pomodoro'),
-            todayPomodoros = filter
-              .pomodorosHaveDate(pomodoros, new Date());
-
-        time.pomodoro = !(todayPomodoros.length % 3) ? '10:00' :
-                                                        '5:00'
-        set(clock, 'time', time);
-      }else{
-        time.pomodoro = '25:00';
-        set(clock, 'time', time);
-      }
-      clock.start();
-    },
-    
     search(term){
       let tabTasks = get(this, '_tabTasks');
       if(term){

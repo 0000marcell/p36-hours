@@ -143,3 +143,9 @@ textarea:focus {
 }
 
 button:focus { outline:0; }
+
+@media(max-width: 600px){
+  .main-header{
+    display: none;
+  }
+}

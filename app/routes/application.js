@@ -6,6 +6,7 @@ import mock from '../p36-hours/mock';
 
 export default Route.extend({
   async model(){
+    //await mock.grabOldInfo(this.store);
     let tasks = await this.store.findAll('task');
     if(!get(tasks, 'length'))
       tasks = await mock.constructDbFromObj(this.store, 
