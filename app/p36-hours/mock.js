@@ -218,11 +218,12 @@ export default {
     });
   },
   // CORS needs to be disabled
+  /*
   grabOldInfo(store){
     return new rsvp.Promise((resolve) => {
       this.deleteAll(store).then(() => {
-        let id = process.env.AWS_ACCESS_KEY_ID,
-            key = process.env.AWS_SECRET_ACCESS_KEY,
+        let id = awsCred.awsAccessKeyId,
+            key = awsCred.awsSecreAccessKey,
             region = 'sa-east-1';
         AWS.config.update({accessKeyId: id,
           secretAccessKey: key,
@@ -237,6 +238,7 @@ export default {
       });
     });
   },
+  */
   backupTask(task){
     let promises = [];
     return new rsvp.Promise((resolve) => {
