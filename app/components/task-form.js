@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import { get, set, computed } from '@ember/object';
+import { get, set, computed, setProperties } from '@ember/object';
 import { inject } from '@ember/service';
 
 export default Component.extend({
@@ -9,6 +9,7 @@ export default Component.extend({
     return get(this, 'model.status');
   }),
   status: ['active', 'archived'],
+  modalService: inject('modal-dialog'),
   selectedTags: computed(async function(){
     return await get(this, 'model.tags').toArray();
   }),
@@ -53,6 +54,25 @@ export default Component.extend({
         }
       }
       get(this, 'submit')(model);
+    },
+    stopPropagation(e){
+      e.stopPropagation();
+    },
+    removeTag(tag){
+      let modal = get(this, 'modalService.modal'),
+          msg = `Do you really wish to delete ${tag.get('name')}`;
+      set(this, 'modal', modal);
+      setProperties(modal, {
+        showDialog: true,
+        dialogMsg: msg,
+        trueDialogText: 'yes',
+        falseDialogText: 'no',
+        dialogFunc: (del) => {
+          if(del)
+            tag.destroyRecord();
+          set(this, 'modal.showDialog', false);
+        }
+      });
     }
   }
 });

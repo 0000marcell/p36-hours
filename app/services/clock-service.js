@@ -13,6 +13,7 @@ export default Service.extend({
   state: 'stopped',
   clock: null,
   store: inject('store'),
+  mode: 'task',
   async init(){
     this._super(...arguments);
     let store = get(this, 'store'),
@@ -29,7 +30,11 @@ export default Service.extend({
     set(this, '_timeBeforeStart', get(this, 'time'));
     setProperties(this, {
       clock: clock.start(get(this, 'time'), (time) => {
-        set(this, 'time', time);
+        if(get(this, 'mode') === 'task'){
+          set(this, 'time', time);
+        }else{
+          set(this, 'time.pomodoro', time.pomodoro);
+        }
       }, () => {
         get(this, 'finishFunc')(this);
       }),

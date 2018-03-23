@@ -29,10 +29,17 @@ export default Controller.extend({
     path.push(item.get('name'));
   },
   selectTask(item){
-    let path = [];
+    let path = [],
+        clock = get(this, 'clock'),
+        time = get(clock, 'time');
+
     this.grabName(item, path);
-    set(this, 'taskPath', path);
-    set(this, 'selectedTask', item);
+    setProperties(this, {
+      taskPath: path,
+      selectedTask: item
+    });
+    set(clock, 'mode', 'task');
+    set(time, 'pomodoro', '25:00');
   },
   async timerFinished(){
     let selectedTask = get(this, 'selectedTask'),
@@ -50,18 +57,24 @@ export default Controller.extend({
 
     let clock = get(this, 'clock'),
         time = get(clock, 'time');
-    if(get(clock, 'state') === 'started'){
+    if(get(clock, 'mode') === 'task'){
       let pomodoros = await this.get('store').findAll('pomodoro'),
           todayPomodoros = filter
             .pomodorosHaveDate(pomodoros, new Date());
 
       set(time, 'pomodoro', 
         !(todayPomodoros.length % 3) ? '10:00' : '5:00');
-
-      set(clock, 'time', time);
+      
+      setProperties(clock, {
+        time: time,
+        mode: 'interval'
+      });
     }else{
       set(time, 'pomodoro', '25:00');
-      set(clock, 'time', time);
+      setProperties(clock, {
+        time: time,
+        mode: 'task'
+      });
     }
     clock.start();
   },

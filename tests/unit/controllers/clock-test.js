@@ -1,3 +1,4 @@
+import PouchDB from 'pouchdb';
 import { moduleFor, test } from 'ember-qunit';
 import helper from '../../helpers/store';
 import rsvp from 'rsvp';
@@ -9,6 +10,9 @@ moduleFor('controller:clock', 'Unit | Controller | clock', {
   beforeEach(){
     this.store = this.container.lookup('service:store');
     helper.setStore(this.store);
+    this.adapter = this.store.adapterFor('application'); 
+    this.adapter
+      .changeDb(new PouchDB(`test-${new Date().getTime()}`));
   }
 });
 
@@ -30,8 +34,7 @@ function initializeController(_this){
 
 test('timerFinish #unit-con-clock-01', 
   async function(assert) {
-  assert.expect(4);
-
+  assert.expect(5);
   let controller = initializeController(this); 
 
   let clock = controller.get('clock');
@@ -49,7 +52,7 @@ test('timerFinish #unit-con-clock-01',
   });
   controller.set('selectedTask', task);
   await run(() => {
-    controller.send('timerFinished');
+    controller.timerFinished();
   });
   return new rsvp.Promise((resolve) => {
     setTimeout(async () => {
@@ -58,6 +61,7 @@ test('timerFinish #unit-con-clock-01',
         'task has one pomodoro');
       assert.equal(get(clock, 'time').pomodoro, '5:00');
       assert.equal(get(clock, 'state'), 'started');
+      assert.equal(get(clock, 'mode'), 'interval');
       resolve();
     }, 300);
   });

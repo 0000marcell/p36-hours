@@ -14,7 +14,6 @@ moduleFor('service:clock-service', 'Unit | Service | clock service', {
   }
 });
 
-// Replace this with your real tests.
 test('init clock with right values #unit-clock-service-01', 
   async function(assert) {
 
@@ -76,4 +75,22 @@ test('pause and resume the clock with #unit-clock-service-03',
       }, 1100)
     }, 1100)
   });
+});
+
+test('do not count week/day in interval #unit-clock-service-04', 
+  async function(assert){
+    let service = this.subject();
+    await service.init();
+    service.set('mode', 'interval');
+    service.start();
+    return new rsvp.Promise((resolve) => {
+      setTimeout(() => {
+        assert.equal(service.get('time.week'), '00:00:00', 
+          'week time did not changed');
+        assert.equal(service.get('time.day'), '00:00:00', 
+          'day time did not changed');
+        service.reset();
+        resolve();
+      }, 1100)
+    });
 });

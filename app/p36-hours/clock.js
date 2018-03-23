@@ -6,7 +6,7 @@ import { set, get } from '@ember/object';
 
 const HOUR = 3600,
       MIN = 60,
-      POMODORO = 1500;
+      POMODORO = 1800;
 
 export default {
   start(time, cb, finished){

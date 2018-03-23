@@ -20,7 +20,8 @@
   as |item|}}
   <div class="flex-row inline-space-between">
     {{item.name}}
-    <a {{action "removeTag" item bubbles=false}}>x</a>
+    <a onmouseup={{action "stopPropagation"}} 
+       onclick={{action "removeTag" item}}>x</a>
   </div>
 {{/power-select-multiple}}
 {{#if isEdit}}
