@@ -4,10 +4,14 @@ import { alias } from '@ember/object/computed';
 import filter from '../p36-hours/filters';
 import { inject } from '@ember/service';
 
+const icon = "https://s3-sa-east-1.amazonaws.com/marcell-assets/p36-hours-png-logo.png";
+
 export default Controller.extend({
+  breakTitle: '',
   time: alias('clock.time'),
   modalService: inject('modal-dialog'),
   clock: inject('clock-service'),
+  push: inject(),
   showAll: false,
   async init(){
     this._super(...arguments);
@@ -36,10 +40,11 @@ export default Controller.extend({
     this.grabName(item, path);
     setProperties(this, {
       taskPath: path,
-      selectedTask: item
+      selectedTask: item,
+      breakTitle: ''
     });
     set(clock, 'mode', 'task');
-    set(time, 'pomodoro', '25:00');
+    set(time, 'pomodoro', '00:05');
   },
   async timerFinished(){
     let selectedTask = get(this, 'selectedTask'),
@@ -49,6 +54,8 @@ export default Controller.extend({
         task: selectedTask
     });
 
+    
+
     selectedTask.get('pomodoros').pushObject(pomodoro);
 
     await selectedTask.save().then(async () => {
@@ -56,26 +63,36 @@ export default Controller.extend({
     });
 
     let clock = get(this, 'clock'),
-        time = get(clock, 'time');
+        time = get(clock, 'time'),
+        title;
     if(get(clock, 'mode') === 'task'){
+      title = 'Interval started';
       let pomodoros = await this.get('store').findAll('pomodoro'),
           todayPomodoros = filter
             .pomodorosHaveDate(pomodoros, new Date());
 
       set(time, 'pomodoro', 
-        !(todayPomodoros.length % 3) ? '10:00' : '5:00');
+        !(todayPomodoros.length % 3) ? '10:00' : '05:00');
       
       setProperties(clock, {
         time: time,
         mode: 'interval'
       });
+      set(this, 'breakTitle', 'break time...');
     }else{
+      title = 'Pomodoro started';
       set(time, 'pomodoro', '25:00');
       setProperties(clock, {
         time: time,
         mode: 'task'
       });
+      set(this, 'breakTitle', null);
     }
+    this.get('push').create(title, {
+      body: selectedTask.get('name'), 
+      icon: icon, 
+      time: 5000
+    });
     clock.start();
   },
   actions: {
@@ -87,6 +104,11 @@ export default Controller.extend({
 
       if(get(this, 'selectedTask')){
         clock.start();
+        this.get('push').create('Pomodoro started!', {
+          body: get(this, 'selectedTask.name'), 
+          icon: icon, 
+          time: 5000
+        });
       }else{
         let modal = get(this, 'modal');
         setProperties(modal, {
