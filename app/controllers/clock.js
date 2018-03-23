@@ -44,7 +44,7 @@ export default Controller.extend({
       breakTitle: ''
     });
     set(clock, 'mode', 'task');
-    set(time, 'pomodoro', '00:05');
+    set(time, 'pomodoro', '25:00');
   },
   async timerFinished(){
     let selectedTask = get(this, 'selectedTask'),
