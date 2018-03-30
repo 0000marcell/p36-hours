@@ -30,11 +30,7 @@ export default Service.extend({
     set(this, '_timeBeforeStart', get(this, 'time'));
     setProperties(this, {
       clock: clock.start(get(this, 'time'), (time) => {
-        if(get(this, 'mode') === 'task'){
-          set(this, 'time', time);
-        }else{
-          set(this, 'time.pomodoro', time.pomodoro);
-        }
+        set(this, 'time', time);
       }, () => {
         get(this, 'finishFunc')(this);
       }),

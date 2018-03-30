@@ -82,7 +82,10 @@ export default {
   async getDayHCount(store){
     let pomodoros = await store.findAll('pomodoro');
     pomodoros = filters.pomodorosHaveDate(pomodoros, new Date());
-    return this.convertToHour(pomodoros.get('length') * POMODORO);
+    let taskTime = pomodoros.get('length') * POMODORO,
+        extraIntervalTime = 
+          Math.floor(pomodoros.get('length') / 3) * 300;
+    return this.convertToHour(taskTime + extraIntervalTime);
   },
   async getWeekHCount(store){
     let pomodoros = await store.findAll('pomodoro'),
@@ -92,7 +95,11 @@ export default {
     pomodoros = filters.pomodorosInRange(pomodoros, 
           currMonday, currSunday); 
 
-    return this.convertToHour(pomodoros.get('length') * POMODORO);
+    let taskTime = pomodoros.get('length') * POMODORO,
+        extraIntervalTime = 
+          Math.floor(pomodoros.get('length') / 3) * 300
+
+    return this.convertToHour(taskTime + extraIntervalTime);
   },
   async getWeekHCount2(store){
     let weekCount;
