@@ -48,24 +48,22 @@ export default Controller.extend({
   },
   async timerFinished(){
     let selectedTask = get(this, 'selectedTask'),
-        pomodoro = await this.get('store')
-      .createRecord('pomodoro', {
-        date: new Date(),
-        task: selectedTask
-    });
-
-    
-
-    selectedTask.get('pomodoros').pushObject(pomodoro);
-
-    await selectedTask.save().then(async () => {
-      await pomodoro.save();
-    });
-
-    let clock = get(this, 'clock'),
+        clock = get(this, 'clock'),
         time = get(clock, 'time'),
         title;
     if(get(clock, 'mode') === 'task'){
+      let pomodoro = await this.get('store')
+        .createRecord('pomodoro', {
+          date: new Date(),
+          task: selectedTask
+      });
+
+      selectedTask.get('pomodoros').pushObject(pomodoro);
+
+      await selectedTask.save().then(async () => {
+        await pomodoro.save();
+      });
+
       title = 'Interval started';
       let pomodoros = await this.get('store').findAll('pomodoro'),
           todayPomodoros = filter

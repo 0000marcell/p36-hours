@@ -32,7 +32,7 @@ function initializeController(_this){
   });
 }
 
-test('timerFinish #unit-con-clock-01', 
+test('saves pomodoro when timerFinish #unit-con-clock-01', 
   async function(assert) {
   assert.expect(5);
   let controller = initializeController(this); 
@@ -51,23 +51,48 @@ test('timerFinish #unit-con-clock-01',
     name: 'task 1'
   });
   controller.set('selectedTask', task);
-  await run(() => {
-    controller.timerFinished();
+  await run(async () => {
+    await controller.timerFinished();
   });
-  return new rsvp.Promise((resolve) => {
-    setTimeout(async () => {
-      let pomodoros = await task.get('pomodoros');
-      assert.equal(pomodoros.get('length'), 1, 
-        'task has one pomodoro');
-      assert.equal(get(clock, 'time').pomodoro, '5:00');
-      assert.equal(get(clock, 'state'), 'started');
-      assert.equal(get(clock, 'mode'), 'interval');
-      resolve();
-    }, 300);
-  });
+
+  let pomodoros = await task.get('pomodoros');
+  assert.equal(pomodoros.get('length'), 1, 
+    'task has one pomodoro');
+  assert.equal(get(clock, 'time').pomodoro, '05:00');
+  assert.equal(get(clock, 'state'), 'started');
+  assert.equal(get(clock, 'mode'), 'interval');
 });
 
-test('show modal if clock already running #unit-con-clock-02', 
+test('do not save pomodoro when in interval mode #unit-con-clock-02', 
+  async function(assert) {
+
+  let controller = initializeController(this); 
+
+  let clock = controller.get('clock');
+  clock.set('state', 'started');
+  clock.set('mode', 'interval');
+  clock.set('time', {
+    pomodoro: null,
+    day: null,
+    week: null
+  });
+  let task = await helper.createModel('task', {
+    name: 'task 1'
+  });
+  controller.set('selectedTask', task);
+  await run(async () => {
+    await controller.timerFinished();
+  });
+  let pomodoros = await task.get('pomodoros');
+  assert.equal(pomodoros.get('length'), 0, 
+    'no pomodoros on the task');
+  assert.equal(get(clock, 'time').pomodoro, '25:00');
+  assert.equal(get(clock, 'state'), 'started');
+  assert.equal(get(clock, 'mode'), 'task');
+  clock.reset();
+});
+
+test('show modal if clock already running #unit-con-clock-03', 
   async function(assert) {
 
   let controller = initializeController(this),
@@ -88,7 +113,7 @@ test('show modal if clock already running #unit-con-clock-02',
 
 });
 
-test('show dialog if on start if no task is selected #unit-con-clock-03', 
+test('show dialog if on start if no task is selected #unit-con-clock-04', 
   async function(assert) {
 
   let controller = initializeController(this),
@@ -101,11 +126,17 @@ test('show dialog if on start if no task is selected #unit-con-clock-03',
 
 });
 
-test('start clock if a task is selected  #unit-con-clock-04', 
+test('start clock if a task is selected  #unit-con-clock-05', 
   async function(assert) {
 
   let controller = initializeController(this),
       clock = controller.get('clock');
+
+  clock.set('time', {
+    pomodoro: null,
+    day: null,
+    week: null
+  });
 
   let task = await helper.createModel('task', {
     name: 'task 1'
@@ -120,7 +151,7 @@ test('start clock if a task is selected  #unit-con-clock-04',
   clock.reset();
 });
 
-test('controller time observes clock time #unit-con-clock-05', 
+test('controller time observes clock time #unit-con-clock-06', 
   async function(assert) {
 
   let controller = initializeController(this),
