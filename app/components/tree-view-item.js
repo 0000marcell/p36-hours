@@ -1,5 +1,6 @@
 import Component from '@ember/component';
 import { set, get, computed } from '@ember/object';
+import filters from 'p36-hours/p36-hours/filters';
 
 /**
  * @component tree-view-item 
@@ -12,6 +13,13 @@ export default Component.extend({
   tagName: 'li',
   classNames: ['tree-view-item'],
   classNameBindings: ['selected', 'status'],
+  async didInsertElement(){
+    this._super(...arguments);
+    let task = get(this, 'data'),
+        pomodoros = await filters.allPomodorosInTree(task),
+        hours = Math.floor(pomodoros.get('length') / 2);
+    set(this, 'totalTime', `${hours}h`);
+  },
   selected: computed.alias('data.selected'),
   status: computed(function() {
     let status = get(this, 'data.status');

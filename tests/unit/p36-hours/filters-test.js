@@ -8,8 +8,6 @@ import fakeData from 'p36-hours/p36-hours/fake-data';
 import mock from 'p36-hours/p36-hours/mock';
 import { get } from '@ember/object';
 
-
-
 moduleFor('filters', 
   'Unit | p36-hours | filters', {
   integration: true,
@@ -153,4 +151,13 @@ test('grab last task done #unit-filters-05',
 
     assert.equal(get(result, 'name'), 'polishing', 
       'return the right task');
+});
+
+test('grab all pomodoros in the task tree #unit-filters-06', 
+  async function(assert){
+  let tasks = await mock.constructDbFromObj(this.store, fakeData),
+      pomodoros = await filters
+        .allPomodorosInTree(tasks.objectAt(0));
+  assert.equal(pomodoros.get('length'), 39, 
+    'return the right amount of pomodoros in the task tree');
 });

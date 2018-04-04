@@ -49,5 +49,17 @@ export default {
   async lastTaskDone(pomodoros){
     let pomodoro = pomodoros.get('lastObject');
     return await pomodoro.get('task');
+  },
+  // return all pomodoros in the task three
+  async allPomodorosInTree(task){
+    let pomodoros = await task.get('pomodoros').toArray();
+    let children = task.get('children');
+    if(children.get('length')){
+      for(let child of children.toArray()){
+        pomodoros = pomodoros
+          .concat(...await this.allPomodorosInTree(child));
+      }
+    }
+    return pomodoros;
   }
 }
