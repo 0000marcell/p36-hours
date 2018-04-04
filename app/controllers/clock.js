@@ -6,7 +6,7 @@ import { inject } from '@ember/service';
 
 const icon = "https://s3-sa-east-1.amazonaws.com/marcell-assets/p36-hours-png-logo.png";
 
-const POMODORO = '00:10';
+const POMODORO = '25:00';
 
 export default Controller.extend({
   breakTitle: '',

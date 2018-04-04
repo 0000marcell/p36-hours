@@ -11,7 +11,7 @@ import clock from '../p36-hours/clock';
  */
 
 const POMODORO = '25:00',
-      HALFWAY = '00:05';
+      HALFWAY = '13:00';
 
 export default Service.extend({
   state: 'stopped',
