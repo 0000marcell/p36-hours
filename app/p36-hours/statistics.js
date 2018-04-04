@@ -14,7 +14,7 @@ export default {
       pomDate.setHours(0, 0, 0, 0).toString();
       resultObj[pomDate] = 
         resultObj[pomDate] ? 
-          resultObj[pomDate] + 1 : 1
+          resultObj[pomDate] + 0.5 : 0.5
     });
     let sortedKeys = Object.keys(resultObj).map((key) => {
       return new Date(key).getTime();

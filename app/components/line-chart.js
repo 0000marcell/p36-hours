@@ -58,7 +58,7 @@ export default Component.extend({
         .attr("y", 6)
         .attr("dy", "0.71em")
         .attr("text-anchor", "end")
-        .text("Pomodoros")
+        .text("Hours")
 
     g.append("path")
         .datum(data)

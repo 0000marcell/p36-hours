@@ -40,7 +40,7 @@ const obj = {
       },
       {
         name: 'task 2',
-        status: 'active',
+        status: 'archived',
         pomodoros: [
           { date: new Date(2015, 1, 1) },
           { date: new Date(2015, 1, 2) },
@@ -183,6 +183,8 @@ test('unload all data from the store #unit-mock-06',
     await run(async () => {
       await mock.constructDbFromObj(this.store, obj);
       let json = await mock.backupData(this.store);
+      assert.equal(json.tasks[1].status, 'archived', 
+        'preserve the status of the task');
       assert.equal(json.tasks.length, 2, 
         'have the right number of tasks');
       assert.equal(json.tasks[0].pomodoros.length, 3, 

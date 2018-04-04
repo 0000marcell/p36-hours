@@ -110,7 +110,6 @@ export default {
           let deletedTask = [];
           /*
           if(tasks.get('length')){
-            console.log('gonna delete all tasks');
             tasks.map((task) => {
               deletedTask.push(task.destroyRecord());
             });
@@ -150,7 +149,7 @@ export default {
     await run(async () => {
       newTask = await store.createRecord('task', {
         name: task.name,
-        status: 'active',
+        status: task.status,
         parent: parent
       }).save();
     });
@@ -209,7 +208,6 @@ export default {
     return new rsvp.Promise((resolve) => {
       let promises = [];
       obj.tasks.forEach((task) => {
-        console.log('gonna create task: ', task.name);
         promises.push(
           this.createTask(store, task)
         );
@@ -223,7 +221,6 @@ export default {
   /*
   grabOldInfo(store){
     return new rsvp.Promise((resolve) => {
-      console.log('gonna delete everything');
       this.deleteAll(store).then(() => {
         let id = awsCred.awsAccessKeyId,
             key = awsCred.awsSecreAccessKey,
@@ -234,7 +231,6 @@ export default {
         let bucket = new AWS.S3({params: {Bucket: 'pomodorog'}});
         bucket.getObject({Key: 'new.json'}, (error, data) => {
           let obj = JSON.parse(data.Body.toString());
-          console.log('gonna construct the new db!');
           this.constructDbFromObj(store, obj).then(() => {
             resolve('db data saved!');
           });

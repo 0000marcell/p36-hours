@@ -27,7 +27,13 @@ test('converts sec time in to string min #unit-clock-mod-02',
   assert.equal(result, '24:40');
 });
 
-test('converts sec time in to string hour #unit-clock-mod-03', 
+test('converts sec time in to string with pading #unit-clock-mod-03', 
+  function(assert) {
+  let result = clock.convertToMin(9);
+  assert.equal(result, '00:09');
+});
+
+test('converts sec time in to string hour #unit-clock-mod-04', 
   function(assert) {
   assert.equal(clock.convertToHour(3661), '01:01:01');
   assert.equal(clock.convertToHour(3543), '00:59:03');
@@ -35,7 +41,7 @@ test('converts sec time in to string hour #unit-clock-mod-03',
   assert.equal(clock.convertToHour(360002), '100:00:02');
 });
 
-test('getDayHCount  value non zero #unit-clock-mod-04', 
+test('getDayHCount  value non zero #unit-clock-mod-05', 
   async function(assert){
     for (var i = 0; i < 3; i++) {
       await helper.createModel('pomodoro', {
@@ -46,13 +52,13 @@ test('getDayHCount  value non zero #unit-clock-mod-04',
     assert.equal(result, '01:15:00');
 });
 
-test('getDayHCount  value is zero #unit-clock-mod-05', 
+test('getDayHCount  value is zero #unit-clock-mod-06', 
   async function(assert){
     let result = await clock.getDayHCount(this.store);
     assert.equal(result, '00:00:00');
 });
 
-test('getWeekHCount #unit-clock-mod-06', 
+test('getWeekHCount #unit-clock-mod-07', 
   async function(assert){
 
   let currMonday = dateHelper.currMonday(new Date),
@@ -68,7 +74,7 @@ test('getWeekHCount #unit-clock-mod-06',
   assert.equal(await clock.getWeekHCount(this.store), '02:55:00');
 });
 
-test('getWeekHCount  no week count yet #unit-clock-mod-07', 
+test('getWeekHCount  no week count yet #unit-clock-mod-08', 
   async function(assert){
     let result = await clock.getWeekHCount(this.store);
     assert.equal(result, '00:00:00');
@@ -77,7 +83,7 @@ test('getWeekHCount  no week count yet #unit-clock-mod-07',
       await helper.deleteModel(time);
 });
 
-test('start  and resets the clock #unit-clock-mod-08', 
+test('start  and resets the clock #unit-clock-mod-09', 
   async function(assert){
     return new rsvp.Promise((resolve) => {
       let times = {

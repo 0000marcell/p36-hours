@@ -1,5 +1,5 @@
 import { moduleFor, test } from 'ember-qunit';
-import helper from '../../helpers/store';
+import hStore from '../../helpers/store';
 import rsvp from 'rsvp';
 import dateHelper from 'p36-hours/p36-hours/date-helper';
 
@@ -9,7 +9,7 @@ moduleFor('service:clock-service', 'Unit | Service | clock service', {
   integration: true,
   beforeEach(){
     this.store = this.container.lookup('service:store');
-    helper.setStore(this.store);
+    hStore.setStore(this.store);
   },
   async afterEach(){
   }
@@ -22,7 +22,7 @@ test('init clock with right values #unit-clock-service-01',
   last4days.push(new Date());
 
   for(let date of last4days){
-    await helper.createModel('pomodoro', {
+    await hStore.createModel('pomodoro', {
       date: date 
     });
   }

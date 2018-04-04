@@ -6,6 +6,8 @@ import { inject } from '@ember/service';
 
 const icon = "https://s3-sa-east-1.amazonaws.com/marcell-assets/p36-hours-png-logo.png";
 
+const POMODORO = '00:10';
+
 export default Controller.extend({
   breakTitle: '',
   time: alias('clock.time'),
@@ -44,7 +46,7 @@ export default Controller.extend({
       breakTitle: ''
     });
     set(clock, 'mode', 'task');
-    set(time, 'pomodoro', '25:00');
+    set(time, 'pomodoro', POMODORO);
   },
   async timerFinished(){
     let selectedTask = get(this, 'selectedTask'),
@@ -79,7 +81,7 @@ export default Controller.extend({
       set(this, 'breakTitle', 'break time...');
     }else{
       title = 'Pomodoro started';
-      set(time, 'pomodoro', '25:00');
+      set(time, 'pomodoro', POMODORO);
       setProperties(clock, {
         time: time,
         mode: 'task'
@@ -93,12 +95,23 @@ export default Controller.extend({
     });
     clock.start();
   },
+  clockHalfWay(){
+    let selectedTask = get(this, 'selectedTask');
+    this.get('push').create('Clock Halfway', {
+      body: selectedTask.get('name'), 
+      icon: icon, 
+      time: 5000
+    });
+  },
   actions: {
     start(){
       let clock = get(this, 'clock');
 
       if(!get(clock, 'finishFunc'))
         set(clock, 'finishFunc', this.timerFinished.bind(this));
+
+      if(!get(clock, 'clockHalfFunc'))
+        set(clock, 'clockHalfFunc', this.clockHalfWay.bind(this));
 
       if(get(this, 'selectedTask')){
         clock.start();

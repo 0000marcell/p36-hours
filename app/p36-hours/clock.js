@@ -56,10 +56,13 @@ export default {
   convertToMin(time){
     let min = Math.floor(time/ MIN),
         sec = time % MIN,
-        paddingZero = '';
+        padMin = '',
+        padSec = '';
     if(sec < 10)
-      paddingZero = '0';
-    return `${min}:${paddingZero}${sec}`;
+      padSec = '0';
+    if(min < 10)
+      padMin = '0';
+    return `${padMin}${min}:${padSec}${sec}`;
   },
   convertToHour(time){
     let splitStr = this.convertToMin(time).split(':'),

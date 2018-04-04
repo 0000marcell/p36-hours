@@ -113,8 +113,8 @@ test('construct line chart object data #unit-statistics-01',
 
     assert.equal(Object.keys(results).length, 14, 
       'return 14 days of the last two weeks');
-    assert.equal(results[0].value, 1, 
-      '1 for each day');
+    assert.equal(results[0].value, 0.5, 
+      '0.5 for each day');
 });
 
 test('construct week comparison #unit-statistics-02', 

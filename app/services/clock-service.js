@@ -6,8 +6,12 @@ import clock from '../p36-hours/clock';
 /**
  * @service clock-service 
  * @param {Object} time
+ * @param {Function} clockHalfFunc
  * @param {Function} finishFunc
  */
+
+const POMODORO = '25:00',
+      HALFWAY = '00:05';
 
 export default Service.extend({
   state: 'stopped',
@@ -22,7 +26,7 @@ export default Service.extend({
     let timeObj = {
       day: dayHCount,
       week: weekHCount,
-      pomodoro: '25:00'
+      pomodoro: POMODORO
     };
     set(this, 'time', timeObj);
   },
@@ -30,6 +34,9 @@ export default Service.extend({
     set(this, '_timeBeforeStart', get(this, 'time'));
     setProperties(this, {
       clock: clock.start(get(this, 'time'), (time) => {
+        if(time.pomodoro === HALFWAY)
+          get(this, 'clockHalfFunc')(this);
+
         set(this, 'time', time);
       }, () => {
         get(this, 'finishFunc')(this);
