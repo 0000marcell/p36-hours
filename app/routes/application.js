@@ -8,9 +8,10 @@ export default Route.extend({
   async model(){
     //await mock.grabOldInfo(this.store);
     let tasks = await this.store.findAll('task');
-    if(!get(tasks, 'length'))
-      tasks = await mock.constructDbFromObj(this.store, 
-        fakeData);
+    if(!get(tasks, 'length')){
+      await mock.constructDbFromObj(this.store, fakeData);
+      tasks = await this.store.findAll('task');
+    }
 
     return hash({
       tasks: tasks,
