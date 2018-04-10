@@ -42,7 +42,7 @@ export default Controller.extend({
     modalService.set('modal', modal);
 
     this.get('tour').setProperties({
-      steps: tourSteps,
+      steps: [],
       autoStart: false,
       modal: true,   
       defaults: {
@@ -96,7 +96,11 @@ export default Controller.extend({
       });
     },
     showHelp(){
-      this.get('tour').show('upload');
+      let data = tourSteps[this.currentPath];
+      if(data){
+        get(this, 'tour').set('steps', data);
+        get(this, 'tour').show('upload');
+      }
     }
   }
 });

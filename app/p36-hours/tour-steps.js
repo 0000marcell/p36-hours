@@ -11,9 +11,7 @@ let builtInButtons = [
   }
 ];
 
-let globalSteps = [];
-
-let clockSteps = [
+let globalSteps = [
   {
     id: 'upload', 
     options: { 
@@ -53,7 +51,10 @@ let clockSteps = [
       text: 'You can create root tasks here, to create subtasks you need to click the plus assign, inside the task list',
       builtInButtons: builtInButtons
     }
-  },
+  }
+];
+
+let clockSteps = [
   {
     id: 'clock-face h3', 
     options: { 
@@ -96,6 +97,42 @@ let clockSteps = [
   }
 ]
 
-let statisticsSteps = [];
+let statisticsSteps = [
+  {
+    id: 'line-chart',
+    options: {
+      attachTo: '.line-chart-container bottom',
+      text: 'line chart of the amount of hours of the last two months ',
+      builtInButtons: builtInButtons
+    }
+  },
+  {
+    id: 'performance-info',
+    options: {
+      attachTo: '.performance-info bottom',
+      text: 'information about your performance compared to the same period of the previous week',
+      builtInButtons: builtInButtons
+    }
+  },
+  {
+    id: 'mode-select',
+    options: {
+      attachTo: '.mode-select bottom',
+      text: 'select between tag or task mode to filter your data',
+      builtInButtons: builtInButtons
+    }
+  },
+  {
+    id: 'item-select',
+    options: {
+      attachTo: '.item-select bottom',
+      text: 'select one or multiple tags or tasks to filter your data, some charts will not show up depending on the number of items that you choose',
+      builtInButtons: [builtInButtons[1]]
+    }
+  }
+];
 
-export default clockSteps;
+export default {
+  clock: globalSteps.concat(clockSteps),
+  statistics: globalSteps.concat(statisticsSteps) 
+}

@@ -8,6 +8,7 @@ import { extent } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
 
 export default Component.extend({
+  classNames: ['line-chart-container'],
   didRender(){
     this._super(...arguments);
     let data = get(this, 'data');

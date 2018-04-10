@@ -12,20 +12,24 @@
   <div class="flex-row inline-center default-padding">
     <div class="flex-column">
       <h3>mode:</h3>
-      {{#power-select  
-        selected=selectedMode
-        options=modes onchange=(action "selectMode") 
-        as |mode|}}
-        {{mode}}
-      {{/power-select}}
+      <div class="mode-select">
+        {{#power-select  
+          selected=selectedMode
+          options=modes onchange=(action "selectMode") 
+          as |mode|}}
+          {{mode}}
+        {{/power-select}}
+      </div>
       <h3>{{selectedMode}}:</h3>
-      {{#power-select-multiple  
-        selected=selectedItems
-        searchField="name"
-        options=modeItems onchange=(action "selectItems") 
-        as |item|}}
-        {{item.name}}
-      {{/power-select-multiple}}
+      <div class="item-select">
+        {{#power-select-multiple  
+          selected=selectedItems
+          searchField="name"
+          options=modeItems onchange=(action "selectItems") 
+          as |item|}}
+          {{item.name}}
+        {{/power-select-multiple}}
+      </div>
       {{#default-button onClick=(action 'buildData')}}
         load charts
       {{/default-button}}   
