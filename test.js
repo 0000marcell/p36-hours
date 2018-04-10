@@ -1,7 +1,4 @@
-let arr = [1, 2, 3, 4];
+let number = parseInt('19.20');
+let result = number / 2;
+console.log(result);
 
-let arr2 = [5, 6, 7];
-
-let obj = {
-  key: arr.concat(arr2)
-}
