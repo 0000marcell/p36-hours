@@ -1,7 +1,6 @@
 import PouchDB from 'pouchdb';
 import { moduleFor, test } from 'ember-qunit';
 import helper from '../../helpers/store';
-import rsvp from 'rsvp';
 import { run } from '@ember/runloop';
 import { get } from '@ember/object';
 

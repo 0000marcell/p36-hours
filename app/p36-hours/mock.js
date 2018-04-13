@@ -106,7 +106,7 @@ export default {
         })
       );
       return rsvp.all(deleting).then(() => {
-        return store.findAll('task').then((tasks) => {
+        return store.findAll('task').then((/*tasks*/) => {
           let deletedTask = [];
           /*
           if(tasks.get('length')){

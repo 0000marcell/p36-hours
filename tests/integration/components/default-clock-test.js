@@ -1,10 +1,7 @@
 import { moduleForComponent, test } from 'ember-qunit';
 //import { run } from '@ember/runloop';
-import { click } from 'ember-native-dom-helpers';
-//import { click } from "@ember/test-helpers";
 import hbs from 'htmlbars-inline-precompile';
 import helper from '../../helpers/string';
-import rsvp from 'rsvp';
 
 moduleForComponent('default-clock', 'Integration | Component | default clock', {
   integration: true
