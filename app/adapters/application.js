@@ -1,19 +1,18 @@
 import PouchDB from 'pouchdb';
 import { Adapter } from 'ember-pouch';
 
-
-let remote = new PouchDB('https://fierce-brook-21102.herokuapp.com/db');
+PouchDB.debug.enable('pouchdb:http');
 
 let db = new PouchDB('p36-hours-test');
 
+/*
+let remote = new 
+  PouchDB('https://p36-pouchdb-server.herokuapp.com/p36-hours');
 db.sync(remote, {
-   live: true,   // do a live, ongoing sync
-   retry: true   // retry if the connection is lost
+  live: false,   
+  retry: false
 });
-
-//db.destroy();
-
-//window.localStorage.clear();
+*/
 
 export default Adapter.extend({
   db: db
