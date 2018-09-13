@@ -31,9 +31,7 @@ export default Controller.extend({
     let modal = {
       showDialog: false,
       hideButtons: false,
-      dialogFunc: function() {
-        console.error('no dialog func as set yet!');    
-      },
+      dialogFunc: function() {},
       trueDialogText: 'load',
       falseDialogText: 'cancel',
       infoMode: false

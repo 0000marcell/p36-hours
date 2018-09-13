@@ -1,0 +1,20 @@
+<div class="configuration">
+  {{title "configuration"}}
+  {{input value=model.url placeholder="remote server"}}
+  <div>
+    {{input type="checkbox" id="liveSync" checked=model.live}}
+    <label for="liveSync">live sync</label>
+  </div>
+  <div>
+    {{input type="checkbox" id="retry" checked=model.retry}}
+    <label for="retry">retry</label>
+  </div>
+  <div class="flex-row inline-space-between">
+    {{#default-button onClick=(action "save" model)}}
+      save  
+    {{/default-button}}
+    {{#default-button onClick=(action "sync")}}
+      sync 
+    {{/default-button}}
+  </div>
+</div>

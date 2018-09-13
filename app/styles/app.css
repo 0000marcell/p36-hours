@@ -1,6 +1,7 @@
 @import 'flex.css';
 @import 'statistics.css';
 @import 'loading.css';
+@import 'configuration.css';
 @import 'components/menu-bar.css';
 @import 'components/task-path.css';
 @import 'components/default-button.css';
@@ -148,4 +149,26 @@ button:focus { outline:0; }
   .main-header{
     display: none;
   }
+}
+
+.config-button {
+  padding: 0;
+}
+
+.config-button a {
+  text-decoration: none;
+  color: #202020;
+  font-size: 16px;
+}
+
+.ember-checkbox {
+  width: 30px;
+  padding: 0;
+  height: 30px;
+  padding-right: 30px;
+  margin-bottom: 15px;
+}
+
+label {
+  font-size: 26px;
 }

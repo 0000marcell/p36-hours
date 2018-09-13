@@ -1,0 +1,17 @@
+.configuration {
+  width: 410px;
+  margin: 80px auto;
+}
+
+.configuration button {
+  float: right;
+  margin-right: 10px;
+  width: 150px;
+  margin-top: 10px;
+  font-size: 24px;
+}
+
+.configuration .ember-text-field {
+  font-size: 12px;
+  letter-spacing: 0px;
+}

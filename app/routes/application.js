@@ -20,6 +20,7 @@ export default Route.extend({
     });
   },
   afterModel(){
-    this.transitionTo('clock');
+    if(window.history.state.path === "/")
+      this.transitionTo('clock');
   }
 });

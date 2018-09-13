@@ -7,6 +7,12 @@ export default function(){
   );
   this.transition(
     this.fromRoute('clock'),
+    this.toRoute('config'),
+    this.use('toLeft'),
+    this.reverse('toRight')
+  );
+  this.transition(
+    this.fromRoute('clock'),
     this.toRoute('tasks'),
     this.use('toLeft'),
     this.reverse('toRight')
